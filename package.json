@@ -1,0 +1,31 @@
+{
+  "name": "waleed-collaborative-editing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@octokit/core": "^5.0.2",
+    "bitbucket": "^2.4.2",
+    "codemirror": "^5.57.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "github-api": "^0.10.7",
+    "http-errors": "~1.6.3",
+    "mongodb": "^3.6.2",
+    "morgan": "~1.9.1",
+    "node-fetch": "^2.6.1",
+    "ot-text": "^1.0.2",
+    "rdfxml-streaming-parser": "^1.4.0",
+    "reconnecting-websocket": "^4.4.0",
+    "sharedb": "^1.4.1",
+    "sharedb-mongo": "^1.0.0-beta.14",
+    "socket.io": "^4.7.2",
+    "uuidv4": "^6.2.8",
+    "websocket-json-stream": "0.0.3",
+    "ws": "^7.3.1"
+  }
+}

@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>OntoEditor-collaboration</title>
+
+    <script type="text/javascript" src="/lib/codemirror/codemirror.js"></script>
+    <script src="/lib/jquery/jquery-3.5.1.min.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="https://unpkg.com/jshint@2.9.6/dist/jshint.js"></script>
+    <script src="https://unpkg.com/jsonlint@1.6.3/web/jsonlint.js"></script>
+    <script src="https://unpkg.com/csslint@1.0.5/dist/csslint.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/edit/matchbrackets.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/comment/continuecomment.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/comment/comment.js"></script>
+
+    <script type="text/javascript" src="/lib/codemirror/mode/javascript/javascript.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/mode/turtle/turtle.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/mode/xml/xml.js"></script>
+    <script src="/lib/xml-jsonld-turtle/xml-jsonld-turtle.js"></script>
+
+    <script type="text/javascript" src="/lib/codemirror/addon/lint/lint.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/lint/javascript-lint.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/lint/json-lint.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/edit/matchbrackets.js"></script>
+
+
+    <script type="text/javascript" src="/lib/codemirror/addon/display/autorefresh.js"></script>
+
+
+    <!-- mergely lib -->
+    <script src="/lib/mergely/mergely.js"></script>
+    <link rel="stylesheet" href="/lib/mergely/mergely.css">
+
+
+
+    <script type="text/javascript" src="/lib/codemirror/addon/selection/mark-selection.js"></script>
+    <script type="text/javascript" src="lib/sharedb-dist/sharedb-client.min.js"></script>
+    <script type="text/javascript" src="lib/sharedb-dist/ot-text.min.js"></script>
+
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script src="/lib/siiimple-toast/siiimple-toast.min.js"></script>
+
+    <link rel="stylesheet" href="/lib/codemirror/codemirror.css" />
+    <link rel="stylesheet" href="/lib/codemirror/addon/lint/lint.css">
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/siiimple-toast/siiimple-toast.css" />
+
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+
+    <!-- SEARCH  -->
+    <script type="text/javascript" src="/lib/codemirror/addon/search/search.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/search/searchcursor.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/search/jump-to-line.js"></script>
+    <script type="text/javascript" src="/lib/codemirror/addon/dialog/dialog.js"></script>
+    <link rel="stylesheet" href="/lib/codemirror/addon/dialog/dialog.css">
+    <link rel="stylesheet" href="/lib/codemirror/addon/search/matchesonscrollbar.css">
+    <script src="/lib/codemirror/addon/scroll/annotatescrollbar.js"></script>
+    <script src="/lib/codemirror/addon/search/matchesonscrollbar.js"></script>
+
+
+
+    <!-- themes -->
+    <link rel="stylesheet" href="https://codemirror.net/theme/abcdef.css">
+    <link rel="stylesheet" href="https://codemirror.net/theme/bespin.css">
+    <link rel="stylesheet" href="https://codemirror.net/theme/idea.css">
+    <link rel="stylesheet" href="https://codemirror.net/theme/lesser-dark.css">
+    <link rel="stylesheet" href="https://codemirror.net/theme/mbo.css">
+
+
+
+    <script src="/lib/moment/moment-with-locales.js"></script>
+
+    <style type="text/css">
+        html,
+        body,
+        #wrapper {
+            height: 100%;
+            font-family: helvetica, arial, sans-serif;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+        }
+
+        #wrapper {
+            display: flex;
+            max-width: 1500px;
+            margin: auto;
+            flex-direction: column;
+            font-family: sans-serif;
+        }
+
+        #editor {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #users {
+            list-style: none;
+            margin: 0;
+        }
+
+        #users li {
+            width: 75px;
+            height: 25px;
+            margin: 2px;
+            color: white;
+            float: right;
+            text-align: center;
+            line-height: 25px;
+        }
+
+        #editor .CodeMirror {
+            height: 100%;
+            border: 1px solid #eee;
+        }
+
+        .CodeMirror-dialog-top {
+            border-bottom: 0;
+            top: auto;
+            border-top: 3px solid black;
+            bottom: 0;
+            color: white;
+            font-weight: bold;
+            background-color: #C3073F;
+        }
+
+        .CodeMirror-search-hint {
+            display: none;
+        }
+
+        .CodeMirror-search-field {
+            width: 60% !important;
+        }
+
+        /* .mergely-column .CodeMirror {
+    height: 100%;
+} */
+
+
+        @keyframes cursorThrob {
+            0% {
+                opacity: 0.5
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <h1>OntoEditor</h1>
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">Home</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div>
+            <form class="form-inline">
+                <%if (username==null) { var usernameStyle='' }else{ var usernameStyle='display:none;' } %>
+                    <div class="form-group mb-2" style=<%=usernameStyle %> >
+                        <label class="mr-2">Username</label>
+                        <input type="text" class="form-control" id="username" value=<%=username %>>
+                    </div>
+                    <%if (username==null) { var tokenStyle='' }else{ var tokenStyle='display:none;' } %>
+                        <div class="form-group mx-sm-3 mb-2" style=<%=tokenStyle %> >
+                            <label class="mr-2">Token/Password</label>
+                            <input type="password" class="form-control" id="token" value=<%=token %>>
+                        </div>
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label class="mr-2">Commit-Message</label>
+                            <input type="text" class="form-control" id="commit_message" value="...">
+                        </div>
+                        <button onclick="commit_push()" id="commit-push" class="btn btn-primary mb-2">Commit
+                            File</button>
+                            <button onclick="saveAsFile()" class="btn btn-secondary btn ml-2 mb-2">Download File</button>
+
+            </form>
+        </div>
+        <!-- <br>
+
+<div id="mergely"></div> -->
+
+        <!-- 
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mergeFile">
+        Open modal
+      </button>
+     -->
+        <!-- The Modal -->
+        <div class="modal fade" id="mergeFile">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Merge</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div style="display:flex;justify-content: space-around;">
+                            <p>File to be pushed(Git file)</p>Your changes
+                        </div>
+                        <!-- <div id=view></div> -->
+                        <div id="modal-merge-div">
+                            <!-- <div id="mergely"></div> -->
+                        </div>
+
+
+                    </div>
+                    <div class="modal-body">
+                        <button type="button" class="btn btn-info" onclick="complete_merge()">Complete Merge my
+                            changes.</button>
+                        <!-- <button type="button" class="btn btn-info" onclick="replace_push_content()">Replace my changes
+                            only</button> -->
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal"
+                            onclick="commit_push_merge()">Push Commit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Discard</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <small class="alert alert-info" id="file-history-alert" role="alert">
+            Input your login details to get latest file history.
+        </small>
+
+
+        <div>
+            <div class="row">
+                <div class="col-10">
+                    <label class="form-check-label">Syntax Check</label>
+                    <input type="checkbox" id="syntaxCheckToggle" checked data-toggle="toggle" data-size="mini">
+                </div>
+                <div class="col-2">
+                    <p>Select a theme: <select onchange="selectTheme()" id=select>
+                            <option selected>default</option>
+                            <option>abcdef</option>
+                            <option>bespin</option>
+                            <option>idea</option>
+                            <option>lesser-dark</option>
+                            <option>mbo</option>
+                        </select>
+                    </p>
+                </div>
+            </div>
+
+            <div class="syntax-checking">
+                <ul id="parser-result"></ul>
+            </div>
+        </div>
+
+
+        <div class="chat-container">
+
+            <div class="chat" style="display:none">
+                <div class="chat-history clearfix">
+
+                </div>
+                <fieldset>
+                    <input type="text" id="chat-msg" placeholder="Type your message…" autofocus
+                        onkeydown="enter_message()">
+                    <button id="send-chat-msg" onclick="send_message()">Send</button>
+
+                </fieldset>
+
+            </div>
+            <div class="title clearfix">
+                <h3>Chat ! </h3>
+            </div>
+        </div>
+
+
+        <ul id="users"></ul>
+        <div id="editor">
+            <textarea></textarea>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        // Websocket Initialization
+
+        var userName = prompt("What's your name?");
+
+        if (userName != undefined && userName != '') {
+        }
+        else {
+            userName = String.fromCharCode(Math.floor('A'.charCodeAt(0) + Math.random() * 26))
+        }
+        var url_string = window.location.href
+        var url = new URL(url_string);
+        // var roomName = url.searchParams.get("id");
+        var roomName = url.searchParams.get("projId");
+        io = io({
+            query: {
+                roomName: roomName,
+                userName: userName,
+            }
+        })
+
+        io.on('connect', () => {
+
+            // io.emit('name-change', newuser);
+            // console.log(newuser);
+
+            io.on('disconnect', () => clearAll())
+
+            io.once('initialize', e => {
+                console.log(e.names)
+                for (let id in e.anchors) {
+                    if (id.split("room")[0] == roomName && io.id !== id.split("room")[1]) {
+                        setAnchor(id, e.anchors[id])
+                    }
+                }
+                for (let id in e.names) {
+                    if (id.split("room")[0] == roomName && io.id !== id.split("room")[1]) {
+                        addName(id, e.names[id])
+                    }
+                }
+            })
+            io.on('anchor-update', e => {
+                if (io.id === e.id.split("room")[1]) {
+                    return
+                }
+                if (e.id.split("room")[0] == roomName && io.id !== e.id.split("room")[1]) {
+                    setAnchor(e.id, e.anchor)
+                }
+            })
+            io.on('id-join', e => {
+                if (io.id === e.id.split("room")[1]) {
+                    console.log("browser same user");
+                    return
+                }
+
+                if (e.id.split("room")[0] == roomName && io.id !== e.id.split("room")[1]) {
+                    console.log("new user entry same route")
+                    addName(e.id, e.name)
+                    setAnchor(e.id, e.anchor)
+                }
+
+            })
+
+
+            io.on('commit', e => {
+                siiimpleToast.message(e.commit_message, { position: 'top|right' });
+                fileSha = e.fileSha;
+                console.log(e.fileSha);
+            })
+
+
+
+            io.on('chat_message_broadcast', e => {
+                // siiimpleToast.message(e.userName +e.chat_message ,  {position: 'top|right' });
+                $(".chat-history").append(`
+        <div class="chat-message">
+          <span class="time">${e.localTime}</span>
+          <div class="person">${e.userName}:</div>
+          <p class="message clearfix">${e.chat_message}</p>
+        </div>
+        `);
+                $('.chat-history').animate({ scrollTop: $('.chat-history').prop('scrollHeight') }, 500);
+
+            })
+
+            io.on('merge_commit', e => {
+                siiimpleToast.message(e.merge_message, { position: 'top|right' });
+                // fileSha=e.fileSha;
+                // console.log(e.fileSha);
+            })
+
+            io.on('id-left', e => {
+                if (io.id === e.id.split("room")[1]) {
+                    return
+                }
+                else {
+                    if (e.id.split("room")[0] == roomName && io.id !== e.id.split("room")[1]) {
+                        removeId(e.id)
+                    }
+
+                }
+
+            })
+        })
+
+
+
+        $('.chat-container .title').on('click', function () {
+
+            $('.content').animate({ width: 'toggle' }, 350);
+            $('.chat').animate({ width: 'toggle' }, 350);
+            $('.chat-history').animate({ scrollTop: $('.chat-history').prop('scrollHeight') }, 500);
+        });
+
+
+
+        function enter_message(ele) {
+            if (event.key === 'Enter') {
+                send_message();
+            }
+        }
+
+        function send_message() {
+            let chat_message = document.getElementById("chat-msg").value;
+            let localTime = moment.utc(moment.utc().format()).local().format('H:mm');
+            if (chat_message.length > 0) {
+
+                io.emit('chat-message', { userName, roomName, chat_message, localTime });
+                document.getElementById("chat-msg").value = '';
+
+                $(".chat-history").append(`
+        <div class="chat-message">
+          <span class="time">${localTime}</span>
+          <div class="person">${userName}:</div>
+          <p class="message clearfix">${chat_message}</p>
+        </div>
+        `);
+
+                $('.chat-history').animate({ scrollTop: $('.chat-history').prop('scrollHeight') }, 500);
+
+            }
+        }
+    </script>
+
+
+    <script>
+
+        // moment.locale('de');
+        var url_string = window.location.href
+        var url = new URL(url_string);
+
+        var owner = url.searchParams.get("owner");
+        var repo = url.searchParams.get("repo");
+        var branch = url.searchParams.get("branch");
+        var path = url.searchParams.get("path");
+        var fileSha = url.searchParams.get("file_sha");
+        var git = url.searchParams.get("git");
+        var mode = url.searchParams.get("mode");
+
+        var merge_fileSha;
+
+        $(".breadcrumb").append($('<li class="breadcrumb-item active" aria-current="page">' + git + '</li>'));
+        $(".breadcrumb").append($('<li class="breadcrumb-item active" aria-current="page">' + owner + '</li>'));
+        $(".breadcrumb").append($('<li class="breadcrumb-item active" aria-current="page">' + repo + '</li>'));
+        $(".breadcrumb").append($('<li class="breadcrumb-item active" aria-current="page">' + branch + '</li>'));
+        $(".breadcrumb").append($('<li class="breadcrumb-item active" aria-current="page">' + path + '</li>'));
+
+        var language = "application/ld+json"
+        if (mode == 'turtle') {
+            language = 'text/turtle'
+        }
+        if (mode == 'xml') {
+            language = 'application/xml'
+        }
+        if (mode == 'jsonld') {
+            language = 'application/ld+json'
+        }
+
+
+        function rdfXml_validate() {
+            var parserResult = document.getElementById("parser-result")
+            parserResult.innerHTML = ""
+            syntaxParser.validate_rdfXml(ed.getValue(), parserResult);
+        }
+
+
+        function jsonld_validate() {
+            var parserResult = document.getElementById("parser-result")
+            parserResult.innerHTML = ""
+            syntaxParser.validate_jsonLd(ed.getValue(), parserResult);
+        }
+
+
+        function turtle_validate() {
+            var parserResult = document.getElementById("parser-result")
+            parserResult.innerHTML = ""
+            syntaxParser.validate_turtle(ed.getValue(), parserResult);
+        }
+
+
+        function syntaxCheck() {
+            if (document.getElementById("syntaxCheckToggle").checked) {
+                if (mode == 'turtle') {
+                    turtle_validate();
+                }
+                if (mode == 'jsonld') {
+                    jsonld_validate();
+                }
+                if (mode == 'xml') {
+                    rdfXml_validate();
+                }
+            }
+        }
+
+
+        function commit_push() {
+
+            var username = document.getElementById("username").value;
+            var token = document.getElementById("token").value;
+            var message = document.getElementById("commit_message").value;
+
+
+            var formData = {
+                "username": username,
+                "token": token,
+                "message": message,
+                "content": btoa(unescape(encodeURIComponent(ed.getValue()))),
+                "filesha": fileSha,
+                "btfilesha": '1',
+                "branch": branch,
+                "filename": path,
+                "repo": owner + '/' + repo,
+                "git": git
+            };
+            // btoa(ed.getValue())
+            // btoa(unescape(encodeURIComponent(ed.getValue())))
+            $.ajax({
+                type: 'POST',
+                url: '/repo_fileStatus',
+                data: formData,
+                dataType: 'json',
+                encode: true
+            })
+                .done(function (res) {
+                    console.log(res);
+
+                    if (git === 'github') {
+                        if (!res.fileChanged) {
+                            fileSha = res.data.content.sha;
+                            const commit_message = "commit pushed by " + userName
+                            io.emit('commit-pushed', { commit_message, fileSha })
+                        }
+                        if (res.fileChanged) {
+                            console.log(atob(res.data.content))
+                            siiimpleToast.message("Your current file is not synced with git remote file", { position: 'top|right' });
+                            merge_fileSha = res.data.sha;
+
+
+                            $("#modal-merge-div").empty();
+                            $("#modal-merge-div").append(`<div id="mergely"></div>`);
+
+
+                            $('#mergely').mergely({
+                                cmsettings: {
+                                    autoRefresh: true,
+                                    lineNumbers: true,
+                                },
+                                autoupdate: true,
+                                editor_width: 'calc(50% - 25px)',
+                                editor_height: '100%',
+                                license: 'lgpl-separate-notice',
+                                lhs: function (setValue) {
+                                    setValue(decodeURIComponent(escape(atob(res.data.content))));
+                                    // setValue(atob(res.data.content));
+                                },
+                                rhs: function (setValue) {
+                                    setValue(ed.getValue());
+                                }
+                            });
+
+                            // // get async lhsResponse, then set lhs value
+                            // $('#mergely').mergely('lhs', atob(res.data.content));
+                            // // get async rhsResponse, then set rhs value
+                            // $('#mergely').mergely('rhs', ed.getValue());
+
+                            $('#mergeFile').modal()
+                            $('#mergeFile').on('shown.bs.modal', function (e) {
+                                $('#mergely').mergely('update');
+                            })
+
+                        }
+                    }
+                    if (git === 'bitbucket') {
+                        if (!res.fileChanged) {
+                            // fileSha= res.data.content.sha;
+                            // const commit_message = "commit pushed by "+userName
+                            // io.emit('commit-pushed', {commit_message,fileSha})
+                        }
+                        if (res.fileChanged) {
+                            console.log(res.data)
+                            siiimpleToast.message("Please re-check your changes.", { position: 'top|right' });
+
+                            merge_fileSha = fileSha;
+
+                            $("#modal-merge-div").empty();
+                            $("#modal-merge-div").append(`<div id="mergely"></div>`);
+
+
+                            $('#mergely').mergely({
+                                cmsettings: {
+                                    autoRefresh: true,
+                                    lineNumbers: true,
+                                },
+                                autoupdate: true,
+                                editor_width: 'calc(50% - 25px)',
+                                editor_height: '100%',
+                                license: 'lgpl-separate-notice',
+                                lhs: function (setValue) {
+                                    setValue(res.data);
+                                },
+                                rhs: function (setValue) {
+                                    setValue(ed.getValue());
+                                }
+                            });
+
+                            // // get async lhsResponse, then set lhs value
+                            // $('#mergely').mergely('lhs', atob(res.data.content));
+                            // // get async rhsResponse, then set rhs value
+                            // $('#mergely').mergely('rhs', ed.getValue());
+
+                            $('#mergeFile').modal()
+                            $('#mergeFile').on('shown.bs.modal', function (e) {
+                                $('#mergely').mergely('update');
+                            })
+
+                        }
+                    }
+                    if (git === 'bitbucket1') {
+                        if (!res.fileChanged) {
+                            const commit_message = "commit pushed by " + userName
+                            io.emit('commit-pushed', { commit_message, fileSha })
+                        }
+                    }
+                    if (git === 'gitlab') {
+                        if (!res.fileChanged) {
+                            fileSha = res.data.blob_id;
+                            const commit_message = "commit pushed by " + userName
+                            io.emit('commit-pushed', { commit_message, fileSha })
+                        }
+                        if (res.fileChanged) {
+                            console.log(atob(res.data.content))
+                            siiimpleToast.message("Your current file is not synced with git remote file", { position: 'top|right' });
+
+                            merge_fileSha = res.data.blob_id;
+
+                            $("#modal-merge-div").empty();
+
+                            $("#modal-merge-div").append(`<div id="mergely"></div>`);
+
+
+                            $('#mergely').mergely({
+                                cmsettings: {
+                                    autoRefresh: true,
+                                    lineNumbers: true,
+                                },
+                                autoupdate: true,
+                                editor_width: 'calc(50% - 25px)',
+                                editor_height: '100%',
+                                license: 'lgpl-separate-notice',
+                                lhs: function (setValue) {
+                                    setValue(decodeURIComponent(escape(atob(res.data.content))));
+                                    // setValue(atob(res.data.content));
+                                },
+                                rhs: function (setValue) {
+                                    setValue(ed.getValue());
+                                }
+                            });
+
+                            // // get async lhsResponse, then set lhs value
+                            // $('#mergely').mergely('lhs', atob(res.data.content));
+                            // // get async rhsResponse, then set rhs value
+                            // $('#mergely').mergely('rhs', ed.getValue());
+
+
+                            $('#mergeFile').modal()
+
+                            $('#mergeFile').on('shown.bs.modal', function (e) {
+                                $('#mergely').mergely('update');
+                            })
+
+                        }
+                    }
+
+                })
+                .fail(function (err) {
+                    siiimpleToast.message(err.statusText, { position: 'top|right' });
+                    console.log(err);
+                });
+
+            event.preventDefault()
+        }
+
+
+
+        function commit_push_merge() {
+
+            var username = document.getElementById("username").value;
+            var token = document.getElementById("token").value;
+            var message = document.getElementById("commit_message").value;
+
+
+            var formData = {
+                "username": username,
+                "token": token,
+                "message": message,
+                "content": btoa(unescape(encodeURIComponent($('#mergely').mergely('get', 'lhs')))),
+                "filesha": merge_fileSha,
+                "branch": branch,
+                "filename": path,
+                "btfilesha": merge_fileSha,
+                "repo": owner + '/' + repo,
+                "git": git
+            };
+            // btoa(unescape(encodeURIComponent($('#mergely').mergely('get', 'lhs'))))
+            // btoa($('#mergely').mergely('get', 'lhs')),
+
+            $.ajax({
+                type: 'POST',
+                url: '/repo_fileStatus',
+                data: formData,
+                dataType: 'json',
+                encode: true
+            })
+                .done(function (res) {
+                    console.log(res);
+                    if (!res.fileChanged) {
+                        merge_fileSha = '';
+                        fileSha = ''
+                        const merge_message = "Merge file committed by " + userName
+                        io.emit('merge-commit-pushed', { merge_message })
+                    }
+                })
+                .fail(function (err) {
+                    siiimpleToast.message(err.statusText, { position: 'top|right' });
+                    console.log(err);
+                });
+
+            event.preventDefault()
+
+        }
+
+
+
+
+        function commit_history() {
+
+            let username = document.getElementById("username").value;
+            let token = document.getElementById("token").value;
+
+            if (git == 'github') {
+                $.ajax({
+                    type: 'GET',
+                    url: `https://api.github.com/repos/${owner}/${repo}/commits?sha=${branch}&path=${path}&page=1&per_page=1`,
+                    dataType: 'json',
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    encode: true
+                })
+                    .done(function (res) {
+                        console.log(res);
+                        // siiimpleToast.message("Last Commit By "+res[0].commit.committer.name+' at '+res[0].commit.committer.date +'. Message: '+res[0].commit.message, {position: 'bottom|right' });
+                        $('#file-history-alert').attr('class', 'alert alert-info');
+                        $('#file-history-alert').text("Last Commit By " + res[0].commit.committer.name + ' at ' + moment(res[0].commit.committer.date).format('lll') + '. Message: ' + res[0].commit.message);
+                    })
+                    .fail(function (err) {
+                        // siiimpleToast.message(err.statusText, {position: 'top|right' });
+                        // siiimpleToast.alert("Failed to fetch file status.", {position: 'top|right' });
+                        console.log(err);
+                        $('#file-history-alert').attr('class', 'alert alert-danger');
+                        $('#file-history-alert').text("Failed to fetch file status.Make sure you have input your correct credentials.");
+                    });
+            }
+
+            if (git == 'bitbucket') {
+                $.ajax({
+                    type: 'GET',
+                    url: `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/commits/${branch}?path=${path}&pagelen=1`,
+                    dataType: 'json',
+                    headers: {
+                        "Authorization": 'Basic ' + btoa(username + ':' + token)
+                    },
+                    encode: true
+                })
+                    .done(function (res) {
+                        console.log(res);
+                        // siiimpleToast.message("Last Commit By "+res.values[0].author.user.display_name+' at '+res.values[0].date +'. Message: '+res.values[0].message, {position: 'bottom|right' }); 
+                        $('#file-history-alert').attr('class', 'alert alert-info');
+                        $('#file-history-alert').text("Last Commit By " + res.values[0].author.user.display_name + ' at ' + moment(res.values[0].date).format('lll') + '. Message: ' + res.values[0].message);
+                    })
+                    .fail(function (err) {
+                        // siiimpleToast.message(err.statusText, {position: 'top|right' });
+                        // siiimpleToast.alert("Failed to fetch file status.", {position: 'top|right' });
+                        console.log(err);
+                        $('#file-history-alert').attr('class', 'alert alert-danger');
+                        $('#file-history-alert').text("Failed to fetch file status.Make sure you have input your correct credentials.");
+                    });
+            }
+
+            if (git == 'gitlab') {
+                let encodedURIrepo = encodeURIComponent(owner + '/' + repo);
+                let encodeURIfileName = encodeURIComponent(path);
+
+                $.ajax({
+                    type: 'GET',
+                    url: `https://gitlab.com/api/v4/projects/${encodedURIrepo}/repository/commits?path=${encodeURIfileName}&ref_name=${branch}&per_page=1`,
+                    dataType: 'json',
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    encode: true
+                })
+                    .done(function (res) {
+                        console.log(res);
+                        $('#file-history-alert').attr('class', 'alert alert-info');
+                        $('#file-history-alert').text("Last Commit By " + res[0].committer_name + ' at ' + moment(res[0].committed_date).format('lll') + '. Message: ' + res[0].message);
+
+                    })
+                    .fail(function (err) {
+                        // console.log(err);
+                        $('#file-history-alert').attr('class', 'alert alert-danger');
+                        $('#file-history-alert').text("Failed to fetch file status.Make sure you have input your correct credentials.");
+
+                    });
+            }
+
+
+            // event.preventDefault()
+
+        }
+
+        window.setInterval(function () {
+            let token = document.getElementById("token").value;
+            if (token && token != null && token != "" && token != undefined) {
+                commit_history();
+            }
+            else {
+                console.log("empty interval")
+            }
+        }, 5000);
+
+
+
+        function replace_push_content() {
+            $('#mergely').mergely('lhs',
+                $('#mergely').mergely('get', 'rhs')
+            );
+        }
+
+        function complete_merge() {
+            $('#mergely').mergely('merge', 'lhs');
+        }
+
+
+        //______________________________________________________________________________________________________________________________________________________//
+
+        // Indicates whether or not we should not watch
+        // changes emitted by the editor due to changes made
+        // via operations
+        let stopWatch = false
+
+        // Initialize Editor //
+        const ed = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+            lineNumbers: true,
+            mode: language,
+            matchBrackets: true,
+            gutters: ["CodeMirror-lint-markers"],
+            lint: true,
+            extraKeys: {
+                "Shift-Ctrl-Z": function () {
+                    // do nothing
+                },
+                //  "Ctrl-Z": function() { 
+                //     // do nothing
+                //      },    
+            }
+        });
+
+        // Create operations for sharedb based on the editor
+        ed.on('change', (ed, chg) => {
+            if (stopWatch) return
+
+            const stindex = ed.indexFromPos(chg.from)
+            const delta = chg.removed.join('\n').length
+            const addedText = chg.text.join('\n')
+
+            if (delta && !addedText) {
+                sharedoc.submitOp([stindex, { d: delta }])
+            }
+            if (addedText && !delta) {
+                sharedoc.submitOp([stindex, addedText])
+            }
+            if (addedText && delta) {
+                sharedoc.submitOp([stindex, { d: delta }])
+
+                setTimeout(() => { sharedoc.submitOp([stindex, addedText]) }, 1000);
+
+            }
+
+            syntaxCheck();
+        })
+
+        // Update the range in other editors when the selection changes
+        ed.on('cursorActivity', e => {
+            const stPos = ed.getCursor('start')
+            const edPos = ed.getCursor('end')
+            const hdPos = ed.getCursor('head')
+
+            const stindex = ed.indexFromPos(stPos)
+            const edindex = ed.indexFromPos(edPos)
+            const hdindex = ed.indexFromPos(hdPos)
+            const prefixed = hdindex === stindex && stindex !== edindex
+
+            io.emit('anchor-update', { stindex, edindex, prefixed })
+        })
+
+        // ShareDB init //
+        const sharews = new WebSocket(`ws://${window.location.hostname}:8080`)
+        const shareconn = new ShareDB.Connection(sharews)
+        const docMatches = window.location.href.match(/\?doc=([a-zA-Z1-9]+)/)
+        // const sharedoc = shareconn.get('docs', docMatches ? docMatches[1] : 'default')
+
+        // const sharedoc = shareconn.get('docs1', 'default')
+        const sharedoc = shareconn.get('<%= docs  %>', '<%= docsname  %>')
+        console.log('<%= docs  %>');
+
+        // Listen for changes to the document
+        sharedoc.subscribe(d => {
+            stopWatch = true
+            ed.setValue(sharedoc.data)
+            //This prevents value from being empty
+            ed.clearHistory();
+            ed.setCursor(0, 0)
+            ed.focus()
+            syntaxCheck();
+            stopWatch = false
+        })
+        sharedoc.on('op', (op, mine) => {
+            if (mine) return
+            const index = op.length == 2 ? op[0] : 0
+            const data = op.length === 2 ? op[1] : op[0]
+
+            // insert operation if the op is of the form
+            // op [<index>, <string>]
+            if (typeof data === 'string') {
+                const pos = ed.posFromIndex(index)
+
+                stopWatch = true
+                ed.replaceRange(data, pos, pos)
+                stopWatch = false
+
+                // otherwise we assume its a deletion of the form
+                // op [<index>, { d: <char count> }]
+            } else {
+                const delCt = data.d
+                const stPos = ed.posFromIndex(index)
+                const edPos = ed.posFromIndex(index + delCt)
+                const range = { start: stPos, end: edPos }
+
+                stopWatch = true
+                ed.replaceRange('', stPos, edPos)
+                stopWatch = false
+            }
+
+            syntaxCheck();
+        })
+
+        // ShareDB-Independent update events
+        const addName = (id, name) => {
+            const userslist = document.querySelector('#users')
+            const usericon = document.createElement('li')
+            usericon.classList.add(`u-${id}`)
+            usericon.innerHTML = name
+            userslist.appendChild(usericon)
+
+            const color = idToColor(id)
+            const styleTag = document.createElement('style')
+            styleTag.id = `style-${id}`
+            styleTag.innerHTML = `
+                .u-${id} { background-color: ${color}; }
+                .CodeMirror-line .u-${id}                   { background-color: ${hexToRgbaStyle(color, 0.35)}; }
+                .CodeMirror-line .u-${id}.cursor            { opacity: 1; }
+                .CodeMirror-line .u-${id}.cursor.left       { border-left: 2px solid ${color}; }
+                .CodeMirror-line .u-${id}.cursor.right      { border-right: 2px solid ${color}; }
+                .CodeMirror-line .u-${id}.empty             { background-color: transparent; }
+
+            `
+            document.querySelector('head').appendChild(styleTag)
+        }
+
+        const anchorMap = {}
+        const setAnchor = (id, anchor) => {
+            if (id in anchorMap) {
+                anchorMap[id].forEach(m => m.clear())
+                delete anchorMap[id]
+            }
+
+            // Whether or not the cursor is actually at the beginning
+            // or end of the selection
+            let emptyClass = ''
+            let stindex = anchor.stindex
+            const edindex = anchor.edindex
+
+            // Add selection
+            let stPos, edPos, range
+            anchorMap[id] = []
+
+            if (stindex !== edindex) {
+                stPos = ed.posFromIndex(stindex)
+                edPos = ed.posFromIndex(edindex)
+
+                anchorMap[id].push(ed.markText(stPos, edPos, { className: `u-${id}` }))
+            }
+
+            if (stindex === edindex) {
+                stindex = Math.max(0, stindex - 1)
+                emptyClass = 'empty'
+            }
+
+            // Add cursor
+            const index = anchor.prefixed ? stindex : edindex
+            stPos = ed.posFromIndex(index + (anchor.prefixed ? 0 : -1))
+            edPos = ed.posFromIndex(index + (anchor.prefixed ? 1 : 0))
+
+            anchorMap[id].push(ed.markText(stPos, edPos, { className: `u-${id} ${emptyClass} cursor ${anchor.prefixed ? "left" : "right"}` }))
+        }
+
+        const removeId = id => {
+            document.querySelector(`#users li.u-${id}`).remove()
+            document.querySelector(`#style-${id}`).remove()
+            if (id in anchorMap) {
+                anchorMap[id].forEach(m => m.clear())
+                delete anchorMap[id]
+            }
+        }
+
+        const idToColor = id => {
+            let total = 0
+            for (let c of id) total += c.charCodeAt(0)
+
+            let hex = total.toString(16)
+            while (hex.length < 3) hex += hex[hex.length - 1]
+            hex = hex.substr(0, 3)
+
+            let color = '#'
+            for (let c of hex) color += `${c}0`
+
+            return color
+        }
+
+        const hexToRgbaStyle = (hex, opacity) => {
+            hex = hex.replace('#', '')
+            let r, g, b, den
+            if (hex.length === 3) {
+                r = hex[0] + hex[0]
+                g = hex[1] + hex[1]
+                b = hex[2] + hex[2]
+            } else {
+                r = hex.substr(0, 2)
+                g = hex.substr(2, 2)
+                b = hex.substr(4, 2)
+            }
+
+            r = parseInt(r, 16)
+            g = parseInt(g, 16)
+            b = parseInt(b, 16)
+
+            return `rgba(${r},${g},${b},${opacity})`
+        }
+
+        const clearAll = () => {
+            for (let key in anchorMap) removeId(key)
+        }
+
+
+
+
+    function saveAsFile() {
+        event.preventDefault();
+        var textToWrite = ed.getValue();
+        var textFileAsBlob = new Blob([textToWrite], {
+        type: "text/plain;charset=utf-8"
+        });
+        var fileNameToSaveAs = path;
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        downloadLink.innerHTML = "Download File";
+        if (window.webkitURL != null) {
+        // Chrome allows the link to be clicked
+        // without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+        } else {
+        // Firefox requires the link to be added to the DOM
+        // before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        }
+
+        downloadLink.click();
+    }
+
+
+
+        //Select a theme
+        var input = document.getElementById("select");
+        function selectTheme() {
+            var theme = input.options[input.selectedIndex].textContent;
+            ed.setOption("theme", theme);
+            // location.hash = "#" + theme;
+        }
+
+    </script>
+</body>
+
+</html>

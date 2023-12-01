@@ -1,0 +1,1012 @@
+<%- include('header'); -%>
+    <h1>OntoEditor</h1>
+
+    <script>
+        var file_sha;
+        var repo_owner;
+
+
+
+        $(document).ready(function () {
+            var loading = document.getElementById("loader");
+
+            var inputElements = {
+                selectedGit: $('input[name=gitOption]:checked'),
+                username: $('input[name=username]'),
+                token: $('input[name=token]'),
+                selectedFileFormat: $('input[name=fileFormat]:checked'),
+            }
+
+            var editor = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+                lineNumbers: true,
+                readOnly: true,
+            });
+
+            var repos_info = '';
+
+            $('#showRepos').click(function (event) {
+                loading.style.display = "block";
+                $("#showBranches").css("display", "none");
+                $("#showFiles").css("display", "none");
+                $("#openFile").css("display", "none");
+                $("#shareLink").css("display", "none");
+                $("#collaborate_link").css("display", "none");
+
+
+                $('#repos-list').find('option').remove().end()
+                $("#repo-select").css("display", "none");
+
+                $('#branch-list').find('option').remove().end()
+                $("#branch-select").css("display", "none");
+
+                $('#files-list').find('option').remove().end()
+                $("#files-select").css("display", "none");
+
+
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = {
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'selected_file_format': inputElements.selectedFileFormat.val(),
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_listRepos', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+                        // log data to the console so we can see
+                        console.log(data);
+                        repos_info = data.repos.data;
+
+                        $('#repos-list')
+                            .find('option')
+                            .remove()
+                            .end();
+                        for (var i in  repos_info) {
+                            if (repos_info[i].hasOwnProperty('full_name')) {
+                                console.log(repos_info[i].full_name);
+                                $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].full_name));
+                            }
+                            if (repos_info[i].hasOwnProperty('path_with_namespace')) {
+                                $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].path_with_namespace));
+                            }
+                            // else {
+                            //     $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].owner.login + '/' + repos_info[i].name));
+                            // }
+                        }
+                        $("#repo-select").css("display", "block");
+                        $("#showBranches").css("display", "block");
+                        loading.style.display = "none";
+
+
+                        // here we will handle errors and validation messages
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+
+
+            $('#showBranches').click(function (event) {
+                loading.style.display = "block";
+                $("#showFiles").css("display", "none");
+                $("#openFile").css("display", "none");
+
+
+                $('#branch-list').find('option').remove().end()
+                $("#branch-select").css("display", "none");
+
+                $('#files-list').find('option').remove().end()
+                $("#files-select").css("display", "none");
+
+                $("#shareLink").css("display", "none");
+                $("#collaborate_link").css("display", "none");
+
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = {
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_listBranches', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+
+                        // log data to the console so we can see
+                        console.log(data);
+                        repos_info = data.repos.data;
+                        console.log(repos_info);
+
+
+
+                        $('#branch-list')
+                            .find('option')
+                            .remove()
+                            .end()
+                        for (i = 0; i < repos_info.length; i++) {
+                            console.log(repos_info[i].name);
+                            $("#branch-list").append(new Option(repos_info[i].name, repos_info[i].name));
+                        }
+
+                        $("#branch-select").css("display", "block");
+                        $("#showFiles").css("display", "block");
+
+
+                        loading.style.display = "none";
+
+
+
+
+                        // location.href = '/'+data.data;
+
+                        // here we will handle errors and validation messages
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+
+
+
+
+
+            $('#showFiles').click(function (event) {
+
+                loading.style.display = "block";
+                $("#openFile").css("display", "none");
+
+                $('#files-list').find('option').remove().end()
+                $("#files-select").css("display", "none");
+
+                $("#shareLink").css("display", "none");
+                $("#collaborate_link").css("display", "none");
+
+
+
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = {
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'branch': $("#branch-list option:selected").val(),
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_listFiles', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+                        $("#divAddDelete").css("display", "");
+
+                        // log data to the console so we can see
+                        console.log(data);
+                        if ($('input[name=gitOption]:checked').val() === 'github') {
+                            repos_info = data.repos.data.tree;
+                            console.log(repos_info);
+
+
+                            $('#files-list')
+                                .find('option')
+                                .remove()
+                                .end()
+                            for (i = 0; i < repos_info.length; i++) {
+                                // console.log(repos_info[i].path);
+
+
+                                if (repos_info[i].type !== 'tree') {
+                                    // Testing formats
+                                    if (repos_info[i].path.toLowerCase().endsWith('.json') || repos_info[i].path.toLowerCase().endsWith('.ttl') || repos_info[i].path.toLowerCase().endsWith('.xml') || repos_info[i].path.toLowerCase().endsWith('.rdf') || repos_info[i].path.toLowerCase().endsWith('.jsonld') || repos_info[i].path.toLowerCase().endsWith('.rdfxml') || repos_info[i].path.toLowerCase().endsWith('.txt') || repos_info[i].path.toLowerCase().endsWith('.nt') || repos_info[i].path.toLowerCase().endsWith('.owl') || repos_info[i].path.toLowerCase().endsWith('.rdfa'))
+                                        $("#files-list").append(new Option(repos_info[i].path, repos_info[i].path));
+                                }
+                            }
+
+
+                        }
+                        if ($('input[name=gitOption]:checked').val() === 'bitbucket') {
+
+                            repos_info = data.repos;
+                            console.log(repos_info);
+
+                            $('#files-list')
+                                .find('option')
+                                .remove()
+                                .end()
+                            for (i = 0; i < repos_info.length; i++) {
+                                // console.log(repos_info[i].path);
+
+
+                                if (repos_info[i].type !== 'commit_directory') {
+                                    if (repos_info[i].path.toLowerCase().endsWith('.json') || repos_info[i].path.toLowerCase().endsWith('.ttl') || repos_info[i].path.toLowerCase().endsWith('.xml') || repos_info[i].path.toLowerCase().endsWith('.rdf') || repos_info[i].path.toLowerCase().endsWith('.jsonld') || repos_info[i].path.toLowerCase().endsWith('.rdfxml') || repos_info[i].path.toLowerCase().endsWith('.txt') || repos_info[i].path.toLowerCase().endsWith('.nt') || repos_info[i].path.toLowerCase().endsWith('.owl') || repos_info[i].path.toLowerCase().endsWith('.rdfa'))
+                                        $("#files-list").append(new Option(repos_info[i].path, repos_info[i].path));
+                                }
+                            }
+
+                        }
+
+                        if ($('input[name=gitOption]:checked').val() === 'gitlab') {
+
+                            repos_info = data.repos;
+                            console.log(repos_info);
+
+                            $('#files-list')
+                                .find('option')
+                                .remove()
+                                .end()
+                            for (i = 0; i < repos_info.length; i++) {
+                                // console.log(repos_info[i].path);
+
+
+                                if (repos_info[i].type !== 'tree') {
+                                    if (repos_info[i].path.toLowerCase().endsWith('.json') || repos_info[i].path.toLowerCase().endsWith('.ttl') || repos_info[i].path.toLowerCase().endsWith('.xml') || repos_info[i].path.toLowerCase().endsWith('.rdf') || repos_info[i].path.toLowerCase().endsWith('.jsonld') || repos_info[i].path.toLowerCase().endsWith('.rdfxml') || repos_info[i].path.toLowerCase().endsWith('.txt') || repos_info[i].path.toLowerCase().endsWith('.nt') || repos_info[i].path.toLowerCase().endsWith('.owl') || repos_info[i].path.toLowerCase().endsWith('.rdfa'))
+                                        $("#files-list").append(new Option(repos_info[i].path, repos_info[i].path));
+                                }
+                            }
+
+                        }
+
+
+                        $("#files-select").css("display", "block");
+                        $("#openFile").css("display", "block");
+                        loading.style.display = "none";
+
+                        // here we will handle errors and validation messages
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+
+
+            $('#openFile').click(function (event) {
+                loading.style.display = "block";
+                // $("#collab_link_href").attr("href", "")
+                // $("#collab_link_href").html("");
+
+                // siiimpleToast.message('Notification Test', { position: 'top|right' });
+
+
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = {
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'branch': $("#branch-list option:selected").val(),
+                    'filename': $("#files-list option:selected").val(),
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_getFile', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+                        $("#shareLink").css("display", "block");
+                        $("#collaborate_link").css("display", "block");
+                        console.log(data);
+                        // log data to the console so we can see
+                        // console.log(data); 
+                        if ($('input[name=gitOption]:checked').val() === 'github') {
+                            // decodeURIComponent(escape(atob(data.filecontent.content)));
+                            // atob(data.filecontent.content);
+                            repos_info = decodeURIComponent(escape(atob(data.filecontent.data.content)));
+                            console.log(repos_info);
+                            file_sha = data.filecontent.data.sha;
+
+                            // editor.getDoc().setValue(repos_info);
+
+                            $("#iframe-div").empty();
+
+                            if (editor != null) {
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+                            if (editor == null) {
+                                $("#editor").append("<textarea></textarea>");
+
+                                editor = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+                                    lineNumbers: true,
+
+                                });
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+
+                        }
+
+                        if ($('input[name=gitOption]:checked').val() === 'bitbucket') {
+                            repos_info = data.filecontent;
+                            console.log(repos_info);
+                            file_sha = Date.now();
+                            // file_sha = data.filecontent.sha;
+
+                            $("#iframe-div").empty();
+
+                            if (editor != null) {
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+                            if (editor == null) {
+                                $("#editor").append("<textarea></textarea>");
+
+                                editor = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+                                    lineNumbers: true,
+
+                                });
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+
+
+
+                        }
+
+                        if ($('input[name=gitOption]:checked').val() === 'gitlab') {
+                            // decodeURIComponent(escape(atob(data.filecontent.content)));
+                            // atob(data.filecontent.content);
+                            repos_info = decodeURIComponent(escape(atob(data.filecontent.content)));
+                            console.log(repos_info);
+                            file_sha = data.filecontent.blob_id;
+
+
+
+                            // editor.getDoc().setValue(repos_info);
+
+                            $("#iframe-div").empty();
+
+                            if (editor != null) {
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+                            if (editor == null) {
+                                $("#editor").append("<textarea></textarea>");
+
+                                editor = CodeMirror.fromTextArea(document.querySelector('textarea'), {
+                                    lineNumbers: true,
+
+                                });
+                                editor.setValue(repos_info)
+                                editor.setCursor(0, 0)
+                                editor.focus()
+                            }
+
+                        }
+
+
+                        loading.style.display = "none";
+
+                        // location.href = '/'+data.data;
+
+                        // here we will handle errors and validation messages
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+
+
+            $('#collaborate_link').click(function (event) {
+
+                loading.style.display = "block";
+                $("#divAddDelete").css("display", "none");
+
+
+                // get the form data
+                // there are many ways to get this data using jQuery (you can use the class or id also)
+                var formData = {
+                    'username': $('input[name=username]').val(),
+                    'token': $('input[name=token]').val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'branch': $("#branch-list option:selected").val(),
+                    'filename': $("#files-list option:selected").val(),
+                    'file_sha': file_sha,
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+                    'mode': $('input[name=fileFormat]:checked').val()
+
+                };
+
+                console.log(file_sha);
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/collaborate', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+                        $("#collaborate_link").css("display", "none");
+
+                        // log data to the console so we can see
+                        // console.log(data); 
+                        link = data.link
+                        console.log(link);
+
+
+                        var url = 'http://' + window.location.host + '/collaborative_editing?' + link;
+                        // $("#collab_link_href").attr("href", url)
+                        // $("#collab_link_href").html(url);
+                        $("#shareable-link-input").val(url);
+
+                        let url_auth = url + '&token=' + $('input[name=token]').val() + '&username=' + $('input[name=username]').val()
+
+
+
+                        $('<iframe>', {
+                            src: url_auth,
+                            id: 'iframe-collab',
+                            frameborder: 0,
+                            scrolling: 'no',
+                            style: 'height:800px; position: absolute; width:100% ; right: 0px; left: 0px',
+                        }).appendTo('#iframe-div');
+
+                        $('#iframe-collab').on('load', function () {
+                            loading.style.display = "none";
+                        });
+                        // loading.style.display = "none";
+                    })
+                    .fail(function (err) {
+                        console.log(err);
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.statusText, { position: 'top|right' });
+                        }
+                    });
+
+                $("#editor").empty();
+                editor = null;
+
+                // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+
+            $('#commitAdd').click(function (event) {
+                loading.style.display = "block";
+
+                var formData = {
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'branch': $("#branch-list option:selected").val(),
+                    'filename': $("#newFilePath").val() + $(".file-extension option:checked").val(),
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+                    'commit_message': $('#commitMessageAdd').val(),
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_addFile', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+
+                        loading.style.display = "none";
+                        console.log(data);
+                        // $('#addFileModal').modal('hide')
+                        $("#newFilePath").val(null);
+                        $('#commitMessageAdd').val('Create File');
+                        $('#showFiles').click();
+                        siiimpleToast.success("File Created Successfully. You may now select the file from dropdown.", { position: 'top|right' });
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                event.preventDefault();
+            });
+
+
+            $('#commitDelete').click(function (event) {
+                loading.style.display = "block";
+
+                var formData = {
+                    'username': inputElements.username.val(),
+                    'token': inputElements.token.val(),
+                    'repo': $("#repos-list option:selected").val(),
+                    'branch': $("#branch-list option:selected").val(),
+                    'filename': $("#files-list option:selected").val(),
+                    'selected_git': $('input[name=gitOption]:checked').val(),
+                    'commit_message': $('#commitMessageDelete').val(),
+                };
+
+                // process the form
+                $.ajax({
+                    type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                    url: '/repo_deleteFile', // the url where we want to POST
+                    data: formData, // our data object
+                    dataType: 'json', // what type of data do we expect back from the server
+                    encode: true
+                })
+                    // using the done promise callback
+                    .done(function (data) {
+
+                        loading.style.display = "none";
+                        console.log(data);
+                        // $('#addFileModal').modal('hide')
+                        // $("#newFilePath").val(null);
+                        $('#commitMessageDelete').val('Delete File');
+                        $('#showFiles').click();
+                        siiimpleToast.success("File Deleted Successfully.", { position: 'top|right' });
+                    })
+                    .fail(function (err) {
+                        loading.style.display = "none";
+                        if (err.readyState == 0 || err.status == 0) {
+                            siiimpleToast.alert("Unexpected Error", { position: 'top|right' });
+                        }
+                        else {
+                            siiimpleToast.alert(err.responseJSON.err, { position: 'top|right' });
+                        }
+                    });
+
+                event.preventDefault();
+            });
+
+
+
+        });
+
+
+        function copyLink() {
+            /* Get the text field */
+            var copyText = document.getElementById("shareable-link-input");
+            /* Select the text field */
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+        }
+
+
+
+        function openAddFile() {
+            $("#repo-placeholder").text($("#repos-list option:selected").text() + ' /');
+            $("#addFileBranch").text($("#branch-list option:selected").val());
+            $('#addFileModal').modal('show')
+        }
+
+
+        function openDeleteFile() {
+            $("#deleteFilePath").text($("#files-list option:selected").val());
+            $("#deleteFileBranch").text($("#branch-list option:selected").val());
+            $("#commitMessageDelete").val('Delete File ' + $("#files-list option:selected").val());
+            $('#deleteFileModal').modal('show')
+        }
+
+    </script>
+
+
+    <div class="container-fluid">
+        <div id="loader"></div>
+        <div class="row">
+
+            <div class="col-md-3">
+                <nav class="col-md-11 offset-md-1 bg-light sidebar">
+                    <div class="sidebar-sticky">
+
+
+                        <form>
+                            <div class="form-group git-selection">
+                                <label>Select Git</label>
+                                <br>
+                                <div class="btn-group  btn-group-toggle row px-3" data-toggle="buttons">
+                                    <label class="btn btn-outline-secondary active">
+                                        <input type="radio" name="gitOption" id="gitOption" value="github" checked><i
+                                            class="fa fa-github" aria-hidden="true"></i> Github
+                                    </label>
+                                    <label class="btn btn-outline-secondary">
+                                        <input type="radio" name="gitOption" id="gitOption" value="gitlab"><i
+                                            class="fa fa-gitlab" aria-hidden="true"></i> Gitlab
+                                    </label>
+                                    <label class="btn btn-outline-secondary">
+                                        <input type="radio" name="gitOption" id="gitOption" value="bitbucket"><i
+                                            class="fa fa-bitbucket" aria-hidden="true"></i> Bitbucket
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputUsername">Username (for login)</label>
+                                <input type="text" id="inputUsername" name="username" class="form-control"
+                                    placeholder="Username">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputPassToken">Token or Password</label>
+                                <input type="password" id="inputPassToken" name="token" class="form-control"
+                                    placeholder="Password/Token">
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Select Format</label>
+                                <div class="row">
+                                    <div class="form-check">
+                                        <div class="col">
+                                            <label class="form-check-label">
+                                                <input type="radio" checked="checked" class="form-check-input"
+                                                    name="fileFormat" value="turtle">Turle
+                                            </label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-check">
+                                        <div class="col">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="fileFormat"
+                                                    value="jsonld">Json-LD
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <div class="col">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input" name="fileFormat"
+                                                    value="xml">XML
+                                            </label>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-block" id="showRepos">Show Repos</button>
+
+                            <div class="form-group" id="repo-select" style="display:none">
+                                <label>Repos</label>
+                                <div class="">
+                                    <select class="form-control popup-show" id="repos-list">
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+
+                            <button type="button" class="btn btn-primary btn-block" style="display:none"
+                                id="showBranches">Show Branches</button>
+
+                            <div class="form-group" id="branch-select" style="display:none">
+                                <label>Branches</label>
+                                <div class="">
+                                    <select class="form-control popup-show" id="branch-list">
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                            <button type="button" class="btn btn-primary btn-block" style="display:none"
+                                id="showFiles">Show Files</button>
+
+                            <div class="form-group" id="files-select" style="display:none">
+                                <label>Files</label>
+                                <div class="">
+                                    <select class="form-control popup-show" id="files-list">
+                                    </select>
+
+                                </div>
+
+                                <div id="tree"></div>
+
+                            </div>
+
+
+
+                            <button type="button" class="btn btn-primary btn-block" style="display:none"
+                                id="openFile">Open File</button>
+
+                            <div class="row mt-2" id="divAddDelete" style="display: none;">
+                                <div class="col pr-1">
+                                    <button type="button" class="btn btn-info btn-block" id="addFile"
+                                        data-toggle="modal" onclick="openAddFile()"><i class="fa fa-plus-circle"
+                                            aria-hidden="true"></i> Add File</button>
+                                </div>
+                                <div class="col pl-1">
+                                    <button type="button" class="btn btn-danger btn-block" id="deleteFile"
+                                        data-toggle="modal" onclick="openDeleteFile()"><i class="fa fa-trash"
+                                            aria-hidden="true"></i> Delete File</button>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Add File Modal -->
+                            <div class="modal fade" id="addFileModal" tabindex="-1" role="dialog"
+                                aria-labelledby="addFileModalTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle"><i
+                                                    class="fa fa-plus-circle" aria-hidden="true"
+                                                    style="color:green"></i> Add New File</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label>File Path</label>
+                                                <div class="input-group mb-2">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text" id="repo-placeholder">
+                                                        </div>
+                                                    </div>
+                                                    <input type="text" class="form-control" id="newFilePath"
+                                                        placeholder="path and file Name">
+
+                                                    <select class="file-extension" id="file-extension"
+                                                        aria-label="file-extension">
+                                                        <option selected value=".ttl">ttl</option>
+                                                        <option value=".jsonld">jsonld</option>
+                                                        <option value=".json">json</option>
+                                                        <option value=".rdfxml">rdfxml</option>
+                                                        <option value=".xml">xml</option>
+                                                        <option value=".rdf">rdf</option>
+                                                        <option value=".txt">txt</option>
+                                                    </select>
+
+                                                </div>
+
+                                            </div>
+                                            <p>Target Branch: <strong id="addFileBranch"></strong></p>
+
+                                            <br>
+
+                                            <div class="form-group">
+                                                <label for="commitMessage">Commit Message</label>
+                                                <input type="text" class="form-control" id="commitMessageAdd" required
+                                                    value="Create File">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-success" data-dismiss="modal"
+                                                id="commitAdd">Commit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Delete File Modal -->
+                            <div class="modal fade" id="deleteFileModal" tabindex="-1" role="dialog"
+                                aria-labelledby="deleteFileModalTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle"><i
+                                                    class="fa fa-exclamation-circle" aria-hidden="true"
+                                                    style="color:red"></i> Delete File</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Committing this change will delete <strong id="deleteFilePath"></strong>
+                                                from your repository</p>
+                                            <p>Target Branch: <strong id="deleteFileBranch"></strong></p>
+
+                                            <br>
+                                            <div class="form-group">
+                                                <label for="commitMessage">Commit Message</label>
+                                                <input type="text" class="form-control" id="commitMessageDelete"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                                id="commitDelete">Commit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <br>
+                            <br>
+
+                        </form>
+                    </div>
+                </nav>
+            </div>
+
+
+
+            <!-- Editor Area -->
+            <main role="main" class="col-md-9 ml-sm-auto px-4">
+
+                <div
+                    class="row d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+
+                    <br>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="mr-2 d-flex">
+                            <!-- <button class="btn btn-sm btn-outline-secondary">Shareable Link</button> -->
+                            <!-- <a id="collab_link_href" href="" target="_blank"></a> -->
+                            <button id="help" class="btn btn-sm btn-outline-secondary" data-toggle="modal"
+                                data-target="#HelpModal"><i class="fa fa-info-circle" aria-hidden="true"></i>
+                                Help</button>
+                            <button id="shareLink" class="btn btn-sm btn-outline-secondary" data-toggle="modal"
+                                data-target="#ShareModal" style="display:none;"><i class="fa fa-share-square"
+                                    aria-hidden="true"></i> Share</button>
+                            <button id="collaborate_link" class="btn btn-sm btn-outline-secondary"
+                                style="display:none;"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Start
+                                Editing</button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+                <!-- Modal -->
+                <div class="modal fade" id="ShareModal" tabindex="-1" role="dialog"
+                    aria-labelledby="ShareModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ShareModalLongTitle">Shareable Link</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="input-group mb-3">
+                                    <input id="shareable-link-input" readOnly type="text" class="form-control"
+                                        placeholder="Loading link..." aria-label="Shareable link">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="copyLink"
+                                            onclick="copyLink()">Copy Link</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Modal -->
+                <div class="modal fade" id="HelpModal" tabindex="-1" role="dialog" aria-labelledby="HelpCenterTitle"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="HelpModalLongTitle">Help for using the editor.</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    <li>Select Git</li>
+                                    <li>Input your token details.</li>
+                                    <li>Open file and click Start Editing.</li>
+                                    <li>Click Share to collaboratively edit with multiple users.</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div id="editor" style="width:100%;">
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="ui container" id="iframe-div">
+
+                </div>
+
+
+            </main>
+
+
+
+        </div>
+    </div>
+
+    <%- include('footer'); -%>

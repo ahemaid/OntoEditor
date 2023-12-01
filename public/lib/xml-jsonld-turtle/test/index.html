@@ -1,0 +1,85 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Test</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+
+</head>
+
+<body>
+<h1>Test</h1>
+
+<div>
+<button onclick="rdfXml_validate()">Validate RDF/XmL</button>
+<button onclick="jsonld_validate()">Validate JSONLD</button>
+<button onclick="turtle_validate()">Validate Turtle</button>
+</div>
+
+<textArea id="content" rows="25" cols="100"><?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cd="http://www.recshop.fake/cd#"> <rdf:Description
+ rdf:about="http://www.recshop.fake/cd/Beatles">
+ <cd:artist>
+   <rdf:Bag>
+     <rdf:li>John</rdf:li>
+     <rdf:li>Paul</rdf:li>
+     <rdf:li>George</rdf:li>
+     <rdf:li>Ringo</rdf:li>
+   </rdf:Bag>
+  </cd:artist>
+</rdf:Description>
+</rdf:RDF>
+</textArea>
+
+
+<br>
+
+<div id="error-container">
+<pre id="parser-result"></pre>
+</div>
+
+
+
+
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+  
+  
+  
+
+function rdfXml_validate(){
+var parserResult = document.getElementById("parser-result")
+parserResult.innerHTML = ""
+
+myBundle.validate_rdfXml(document.getElementById("content").value, parserResult);
+
+
+}
+
+
+function jsonld_validate(){
+var parserResult = document.getElementById("parser-result")
+parserResult.innerHTML = ""
+
+myBundle.validate_jsonLd(document.getElementById("content").value , parserResult);
+
+}
+
+
+function turtle_validate(){
+var parserResult = document.getElementById("parser-result")
+parserResult.innerHTML = ""
+
+myBundle.validate_turtle(document.getElementById("content").value , parserResult);
+}
+  
+ 
+  </script>
+</body>
+</html>

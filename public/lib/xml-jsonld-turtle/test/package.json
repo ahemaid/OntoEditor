@@ -1,0 +1,21 @@
+{
+  "name": "xxx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "browserify": "^17.0.0",
+    "http-server": "^0.12.3",
+    "jsonld-context-parser": "^2.1.1",
+    "jsonld-streaming-parser": "^2.2.0",
+    "n3": "^1.6.4",
+    "path": "^0.12.7",
+    "rdfxml-streaming-parser": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
