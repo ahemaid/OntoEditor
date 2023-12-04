@@ -64,24 +64,25 @@
                     .done(function (data) {
                         // log data to the console so we can see
                         console.log(data);
-                        repos_info = data.repos.data;
+                        repos_info = data.repos;
+                        console.log(repos_info);
 
                         $('#repos-list')
                             .find('option')
                             .remove()
-                            .end();
-                        for (var i in  repos_info) {
-                            if (repos_info[i].hasOwnProperty('full_name')) {
-                                console.log(repos_info[i].full_name);
+                            .end()
+                        for (i = 0; i < repos_info.length; i++) {
+                            if (repos_info[i].full_name) {
                                 $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].full_name));
                             }
-                            if (repos_info[i].hasOwnProperty('path_with_namespace')) {
+                            if (repos_info[i].path_with_namespace) {
                                 $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].path_with_namespace));
                             }
                             // else {
                             //     $("#repos-list").append(new Option(repos_info[i].name, repos_info[i].owner.login + '/' + repos_info[i].name));
                             // }
                         }
+
                         $("#repo-select").css("display", "block");
                         $("#showBranches").css("display", "block");
                         loading.style.display = "none";
@@ -143,7 +144,7 @@
 
                         // log data to the console so we can see
                         console.log(data);
-                        repos_info = data.repos.data;
+                        repos_info = data.repos;
                         console.log(repos_info);
 
 
@@ -228,7 +229,7 @@
                         // log data to the console so we can see
                         console.log(data);
                         if ($('input[name=gitOption]:checked').val() === 'github') {
-                            repos_info = data.repos.data.tree;
+                            repos_info = data.repos.tree;
                             console.log(repos_info);
 
 
@@ -352,9 +353,9 @@
                         if ($('input[name=gitOption]:checked').val() === 'github') {
                             // decodeURIComponent(escape(atob(data.filecontent.content)));
                             // atob(data.filecontent.content);
-                            repos_info = decodeURIComponent(escape(atob(data.filecontent.data.content)));
+                            repos_info = decodeURIComponent(escape(atob(data.filecontent.content)));
                             console.log(repos_info);
-                            file_sha = data.filecontent.data.sha;
+                            file_sha = data.filecontent.sha;
 
                             // editor.getDoc().setValue(repos_info);
 

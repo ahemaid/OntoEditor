@@ -42,44 +42,44 @@ router.post("/repo_listRepos", async function (req, res, next) {
       }
 
 
-      // var user = gh.getUser();
+      var user = gh.getUser();
        console.log(username)
 
-      // user
-      //   .listRepos()
-      //   .then(function ({ data: reposJson }) {
-      //     repos = reposJson;
-      //     console.log(repos)
+      user
+        .listRepos()
+        .then(function ({ data: reposJson }) {
+          repos = reposJson;
+          console.log(repos)
 
-      //     res.status(200).json({ repos: reposJson });
-      //   })
-      //   .catch(function (err) {
-      //     console.log(err)
-
-      //     res.status(400).json({ err: err.response.statusText });
-      //   });
-
-
-        // Octokit.js
-        // https://github.com/octokit/core.js#readme
-        const octokit = new Octokit({
-          auth: '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'
+          res.status(200).json({ repos: reposJson });
         })
+        .catch(function (err) {
+          console.log(err)
 
-        let response = await octokit.request('GET /users/{username}/repos', {
-          username: username,
-          headers: {
-        'X-GitHub-Api-Version': '2022-11-28'
-          }
-      })
-      // console.log(response);
-      // let result = await response.json();
-      if (response.status == 200) {
-        res.status(200).json({ repos: response });
-    } else {
-        this.errorMessage = "Failed to load posts!";
-        res.status(400).json({ err: this.errorMessage });
-    }
+          res.status(400).json({ err: err.response.statusText });
+        });
+
+
+    //     // Octokit.js
+    //     // https://github.com/octokit/core.js#readme
+    //     const octokit = new Octokit({
+    //       auth: token
+    //     })
+
+    //     let response = await octokit.request('GET /users/{username}/repos', {
+    //       username: username,
+    //       headers: {
+    //     'X-GitHub-Api-Version': '2022-11-28'
+    //       }
+    //   })
+    //   // console.log(response);
+    //   // let result = await response.json();
+    //   if (response.status == 200) {
+    //     res.status(200).json({ repos: response });
+    // } else {
+    //     this.errorMessage = "Failed to load posts!";
+    //     res.status(400).json({ err: this.errorMessage });
+    // }
 
     }
 
@@ -174,40 +174,40 @@ router.post("/repo_listBranches", async function (req, res, next) {
         });
       }
 
-      // const repo = gh.getRepo(owner, repo_name);
+      const repo = gh.getRepo(owner, repo_name);
 
-      // repo
-      //   .listBranches(null)
-      //   .then(function ({ data: data }) {
-      //     // console.log(data);
-      //     res.status(200).json({ repos: data });
-      //   })
-      //   .catch(function (err) {
-      //     // console.error(err);
-      //     res.status(400).json({ err: "something wrong" });
-      //   });
-
-
-      // Octokit.js
-       // https://github.com/octokit/core.js#readme
-      const octokit = new Octokit({
-          auth: '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'
+      repo
+        .listBranches(null)
+        .then(function ({ data: data }) {
+          // console.log(data);
+          res.status(200).json({ repos: data });
         })
+        .catch(function (err) {
+          // console.error(err);
+          res.status(400).json({ err: "something wrong" });
+        });
 
-      console.log(username   + "      "+ repo_name  )
-      let response = await octokit.request('GET /repos/{owner}/{repo}/branches', {
-        owner: username,
-        repo: repo_name,
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-      })
-      if (response.status == 200) {
-        res.status(200).json({ repos: response });
-    } else {
-        this.errorMessage = "Something wrong!";
-        res.status(400).json({ err: this.errorMessage });
-    }
+
+    //   // Octokit.js
+    //    // https://github.com/octokit/core.js#readme
+    //   const octokit = new Octokit({
+    //       auth: token
+    //     })
+
+    //   console.log(username   + "      "+ repo_name  )
+    //   let response = await octokit.request('GET /repos/{owner}/{repo}/branches', {
+    //     owner: username,
+    //     repo: repo_name,
+    //     headers: {
+    //       'X-GitHub-Api-Version': '2022-11-28'
+    //     }
+    //   })
+    //   if (response.status == 200) {
+    //     res.status(200).json({ repos: response });
+    // } else {
+    //     this.errorMessage = "Something wrong!";
+    //     res.status(400).json({ err: this.errorMessage });
+    // }
     
         
     }
@@ -303,51 +303,51 @@ router.post("/repo_listFiles", async function (req, res, next) {
     branch != undefined
   ) {
     if (selected_git === "github") {
-      // if (username != "") {
-      //   // basic auth
-      //   var gh = new GitHub({
-      //     username: username,
-      //     password: token,
-      //   });
-      // } else {
-      //   // basic auth
-      //   var gh = new GitHub({
-      //     token: token,
-      //   });
-      // }
+      if (username != "") {
+        // basic auth
+        var gh = new GitHub({
+          username: username,
+          password: token,
+        });
+      } else {
+        // basic auth
+        var gh = new GitHub({
+          token: token,
+        });
+      }
 
-      // const repo = gh.getRepo(owner, repo_name);
+      const repo = gh.getRepo(owner, repo_name);
 
-      // repo
-      //   .getTree(branch + "?recursive=1", null)
-      //   .then(function ({ data: data }) {
-      //     // console.log(data);
+      repo
+        .getTree(branch + "?recursive=1", null)
+        .then(function ({ data: data }) {
+          // console.log(data);
 
-      //     res.status(200).json({ repos: data });
-      //   })
-      //   .catch(function (err) {
-      //     // console.error(err);
-      //     res.status(400).json({ err: "something wrong" });
-      //   });
-      const octokit = new Octokit({
-        auth: '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'
-      })
-
-      let response = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}?recursive=1', {
-          owner: username,
-          repo: repo_name,
-          tree_sha: branch, //+'?recursive=1',
-          // recursive: 1,
-          headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
+          res.status(200).json({ repos: data });
         })
-   if (response.status == 200) {
-      res.status(200).json({ repos: response });
-  } else {
-      this.errorMessage = "Something wrong!";
-      res.status(400).json({ err: this.errorMessage });
-  }
+        .catch(function (err) {
+          // console.error(err);
+          res.status(400).json({ err: "something wrong" });
+        });
+  //     const octokit = new Octokit({
+  //       auth: token
+  //     })
+
+  //     let response = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}?recursive=1', {
+  //         owner: username,
+  //         repo: repo_name,
+  //         tree_sha: branch, //+'?recursive=1',
+  //         // recursive: 1,
+  //         headers: {
+  //           'X-GitHub-Api-Version': '2022-11-28'
+  //         }
+  //       })
+  //  if (response.status == 200) {
+  //     res.status(200).json({ repos: response });
+  // } else {
+  //     this.errorMessage = "Something wrong!";
+  //     res.status(400).json({ err: this.errorMessage });
+  // }
     }
 
     if (selected_git === "bitbucket") {
@@ -451,52 +451,52 @@ router.post("/repo_getFile", async function (req, res, next) {
     filename != undefined
   ) {
     if (selected_git === "github") {
-      // if (username != "") {
-      //   // basic auth
-      //   var gh = new GitHub({
-      //     username: username,
-      //     password: token,
-      //   });
-      // } else {
-      //   // basic auth
-      //   var gh = new GitHub({
-      //     token: token,
-      //   });
-      // }
-
-      // const repo = gh.getRepo(owner, repo_name);
-
-      // repo
-      //   .getContents(branch, filename, false, null)
-
-      //   .then(function ({ data: data }) {
-      //     // console.log(data);
-      //     res.status(200).json({ filecontent: data });
-      //   })
-      //   .catch(function (err) {
-      //     // console.error(err);
-      //     res.status(400).json({ err: "something wrong" });
-      //   });
-      console.log(filename+'?ref='+branch)
-        const octokit = new Octokit({
-          auth: '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'
-        })
-        
-        const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}?ref={branch}', {
-          owner: username,
-          repo: repo_name,
-          path: filename ,//+'?ref='+branch,
-          branch: branch,
-          headers: {
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
-        })
-        if (response.status == 200) {
-          res.status(200).json({ filecontent: response });
+      if (username != "") {
+        // basic auth
+        var gh = new GitHub({
+          username: username,
+          password: token,
+        });
       } else {
-          this.errorMessage = "Something wrong!";
-          res.status(400).json({ err: this.errorMessage });
+        // basic auth
+        var gh = new GitHub({
+          token: token,
+        });
       }
+
+      const repo = gh.getRepo(owner, repo_name);
+
+      repo
+        .getContents(branch, filename, false, null)
+
+        .then(function ({ data: data }) {
+          // console.log(data);
+          res.status(200).json({ filecontent: data });
+        })
+        .catch(function (err) {
+          // console.error(err);
+          res.status(400).json({ err: "something wrong" });
+        });
+      // console.log(filename+'?ref='+branch)
+      //   const octokit = new Octokit({
+      //     auth: token
+      //   })
+        
+      //   const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}?ref={branch}', {
+      //     owner: username,
+      //     repo: repo_name,
+      //     path: filename ,//+'?ref='+branch,
+      //     branch: branch,
+      //     headers: {
+      //       'X-GitHub-Api-Version': '2022-11-28'
+      //     }
+      //   })
+      //   if (response.status == 200) {
+      //     res.status(200).json({ filecontent: response });
+      // } else {
+      //     this.errorMessage = "Something wrong!";
+      //     res.status(400).json({ err: this.errorMessage });
+      // }
       
 
 
@@ -888,12 +888,11 @@ router.post("/repo_fileStatus", function (req, res, next) {
       .getContents(branch, filename, false, null)
 
       .then(function ({ data: data }) {
-        //  console.log(data);
-        //  console.log(data.sha)
+         console.log(data);
+         console.log(data.sha)
 
         if (data.sha === filesha) {
           console.log("file is same. we can push the commit");
-
           console.log(branch, filename, content, message);
           repo
             .writeFile(branch, filename, content, message, (encode = true))
@@ -928,6 +927,7 @@ router.post("/repo_fileStatus", function (req, res, next) {
           status: false,
         });
       });
+
   }
   if (selected_git === "bitbucket") {
     console.log("bitbucket selected");

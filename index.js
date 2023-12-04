@@ -10,7 +10,9 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongodb = require("mongodb");
-const { uuid } = require('uuidv4');
+const { v4: uuidv4 } = require('uuid')
+const { Octokit } = require("@octokit/core");
+
 
 const GitHub = require("github-api");
 const { Bitbucket } = require("bitbucket");
@@ -98,7 +100,7 @@ app.get("/collaborative_editing", function (req, res, next) {
   }
 });
 
-app.post("/collaborate", function (req, res) {
+app.post("/collaborate", async function (req, res) {
   const username = req.body.username;
   const token = req.body.token;
   const repos = req.body.repo;
@@ -109,7 +111,9 @@ app.post("/collaborate", function (req, res) {
   const mode = req.body.mode;
   const owner = repos.split("/")[0];
   const repo_name = repos.split("/")[1];
-  const uuidID = uuid()
+  const uuidID = uuidv4()
+  console.log("!!!!!!!!!!!!!!!uuidID!!!!!!!!!!!!!")
+  console.log(uuidID)
 
   if (
     token &&
@@ -174,6 +178,52 @@ app.post("/collaborate", function (req, res) {
             status: false,
           });
         });
+
+        // console.log(filename+'?ref='+branch)
+      //   const octokit = new Octokit({
+      //     auth: token
+      //   })
+        
+      //   const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}?ref={branch}', {
+      //     owner: username,
+      //     repo: repo_name,
+      //     path: fileName ,//+'?ref='+branch,
+      //     branch: branch,
+      //     headers: {
+      //       'X-GitHub-Api-Version': '2022-11-28',
+      //       'Accept': 'application/vnd.github+json'
+      //     }
+      //   })
+      //   if (response.status == 200) {
+      //               console.log(response);
+      //               let data = response.data; 
+      //               let parameters ="projId=" +uuidID +"&owner=" +owner +"&repo=" +repo_name +"&branch=" +branch +"&file_sha=" +file_sha +"&path=" +fileName +"&git=" +selected_git +"&mode=" +mode;
+      //               if (typeof data != "string") {
+      //                 data = JSON.stringify(data, undefined, 2);
+      //               }
+      //               const sharedoc = shareconn.get(uuidID, "default");
+      //               sharedoc.fetch(function (err) {
+      //                 if (err) {
+      //                   console.log(err);
+      //                 } else {
+      //                   if (sharedoc.data == null) sharedoc.create(data.content, "text");
+      //                   res.status(200).json({ link: parameters });
+      //                 }
+      //               });
+      //     // res.status(200).json({ filecontent: response });
+      // } else {
+      //     // this.errorMessage = "Something wrong!";
+      //     // res.status(400).json({ err: this.errorMessage });
+
+      //     res.status(err.response.status).json({
+      //       statusText: err.response.statusText,
+      //       status: false,
+      //     });
+      // }
+      
+
+
+
     }
 
     if (selected_git === "bitbucket") {
