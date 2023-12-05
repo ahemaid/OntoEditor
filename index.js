@@ -250,9 +250,9 @@ app.post("/collaborate", async function (req, res) {
 
       bitbucket.source
         .read({
+          commit: branch,
           repo_slug: repo_name,
           workspace: owner,
-          node: branch,
           path: fileName,
         })
         .then(({ data }) => {

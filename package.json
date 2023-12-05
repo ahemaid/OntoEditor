@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@octokit/core": "^5.0.2",
-    "bitbucket": "^2.4.2",
+    "bitbucket": "^2.11.0",
     "codemirror": "^5.57.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",

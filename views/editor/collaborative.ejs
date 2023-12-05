@@ -798,7 +798,8 @@
                     url: `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/commits/${branch}?path=${path}&pagelen=1`,
                     dataType: 'json',
                     headers: {
-                        "Authorization": 'Basic ' + btoa(username + ':' + token)
+                        //"Authorization": 'Basic ' + btoa(username + ':' + token)
+                        "Authorization": "Bearer " + token
                     },
                     encode: true
                 })

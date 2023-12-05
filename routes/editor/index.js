@@ -288,6 +288,7 @@ router.post("/repo_listFiles", async function (req, res, next) {
   const owner = repos.split("/")[0];
   const repo_name = repos.split("/")[1];
 
+
   if (
     selected_git &&
     typeof selected_git !== "" &&
@@ -373,7 +374,7 @@ router.post("/repo_listFiles", async function (req, res, next) {
       const bitbucket = new Bitbucket(clientOptions);
 
       bitbucket.repositories
-        .readSrc({
+        .readSrcRoot({
           repo_slug: repo_name,
           workspace: owner,
           node: branch,
@@ -526,18 +527,18 @@ router.post("/repo_getFile", async function (req, res, next) {
 
       bitbucket.source
         .read({
+          commit: branch,
           repo_slug: repo_name,
           workspace: owner,
-          node: branch,
           path: filename,
         })
         .then(({ data }) => {
-          // console.log(data);
+           console.log(data);
 
           res.status(200).json({ filecontent: data });
         })
         .catch((err) => {
-          // console.error(err);
+           console.error(err);
           res.status(400).json({ err: "something wrong" });
         });
     }
@@ -975,9 +976,9 @@ router.post("/repo_fileStatus", function (req, res, next) {
     } else {
       bitbucket.source
         .read({
+          commit: branch,
           repo_slug: repo_name,
           workspace: owner,
-          node: branch,
           path: filename,
         })
         .then(({ data }) => {
