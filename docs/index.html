@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="author"
+      content="Ahmad Hemid, Waleed Shabbir, Dr.Abderrahmane Khiat, "
+    />
+    <meta
+      name="keywords"
+      content="KGraphX, vowl, visual notation, web ontology language, owl, rdf, ontology visualization, ontologies, semantic web"
+    />
+    <meta
+      name="description"
+      content="KGraphX - Web-based Visualization of Ontologies"
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <style>
+      body {
+        font-family: "Roboto";
+      }
+
+      button {
+        background-color: cornflowerblue;
+        color: white;
+        border-radius: 5px;
+      }
+
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 30px;
+        height: 30px;
+        -webkit-animation: spin 2s linear infinite;
+        /* Safari */
+        animation: spin 2s linear infinite;
+      }
+
+      /* Safari */
+      @-webkit-keyframes spin {
+        0% {
+          -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <style>
+      .class-inner {
+        margin: 3px;
+        border-style: dashed;
+        border-color: beige;
+        cursor: pointer;
+      }
+
+      /* Add Animation */
+      @-webkit-keyframes animatetop {
+        from {
+          top: -300px;
+          opacity: 0;
+        }
+
+        to {
+          top: 0;
+          opacity: 1;
+        }
+      }
+
+      @keyframes animatetop {
+        from {
+          top: -300px;
+          opacity: 0;
+        }
+
+        to {
+          top: 0;
+          opacity: 1;
+        }
+      }
+
+      /* The Close Button */
+      .close {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .modal-header {
+        padding: 2px 16px;
+        background-color: rgb(113, 155, 211);
+        color: white;
+      }
+
+      .modal-body {
+        padding: 2px 16px;
+      }
+
+      .modal-footer {
+        padding: 2px 16px;
+        background-color: #fff;
+        color: white;
+      }
+    </style>
+    <style>
+      /* End Reset */
+
+      /* Default Font Styles
+______________________*/
+      .section-wrap {
+        width: 100%;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .section-wrap .section {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      .section-wrap .top-section {
+        border-bottom: 1px solid #34495e;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .section-wrap .top-section a {
+        color: #69c;
+        font-size: 14px;
+      }
+
+      .section-wrap .top-section a:hover {
+        color: #007bff;
+      }
+
+      .section-wrap .heading-section {
+        text-align: center;
+        padding-bottom: 20px;
+      }
+
+      .section-wrap .heading-section h2 {
+        font-size: 18px;
+      }
+
+      .section-wrap .img-wrap {
+        padding-bottom: 10px;
+        border-bottom: 2px solid #fff;
+        margin-bottom: 15px;
+      }
+
+      .section-wrap .img-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .section-wrap .tab-label {
+        font-weight: bold;
+        padding-bottom: 10px;
+        display: block;
+        cursor: pointer;
+      }
+
+      .section-wrap .tab-label em {
+        font-style: normal;
+        float: left;
+        width: 80%;
+        font-size: 16px;
+      }
+
+      .section-wrap .tab-label span {
+        text-align: right;
+        float: right;
+        width: 15%;
+        font-size: 16px;
+      }
+
+      .section-wrap-prop .tab-content {
+        display: none;
+      }
+
+      .section-wrap .tab-content {
+        display: none;
+      }
+
+      .datatype-content ul {
+        padding: 0;
+      }
+
+      .datatype-content li {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        list-style: none;
+      }
+
+      .datatype-content .data-heading {
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .datatype-content .data-heading span {
+        display: block;
+        padding: 3px 10px;
+        border: 2px solid #9467bd;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -o-border-radius: 4px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .datatype-content .data-text {
+        display: inline-block;
+      }
+
+      .datatype-content .data-text span {
+        font-style: normal;
+        font-size: 13px;
+      }
+
+      .datatype-content .data-text span::before {
+        content: ":";
+        margin-right: 5px;
+      }
+
+      .datatype-content.block-li .data-heading {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      .datatype-content.block-li .data-text {
+        display: block;
+        text-align: center;
+      }
+
+      .datatype-content.block-li .data-text a {
+        color: #bdc3c7;
+      }
+
+      .datatype-content.block-li .data-text span::before {
+        content: "";
+        margin-right: 0;
+      }
+
+      .tabs-wrap .tab {
+        margin-bottom: 20px;
+      }
+
+      .tabs-wrap .tabs .tab:last-child {
+        margin-bottom: 0;
+      }
+
+      .innertab {
+        padding: 5px;
+        margin-bottom: 5px;
+      }
+
+      .innertab label {
+        display: block;
+        font-weight: bold;
+        cursor: pointer;
+        border: 2px solid #2e855e;
+        font-size: 14px;
+        border-radius: 2px;
+        padding: 5px;
+        color: black !important;
+        position: relative;
+      }
+
+      .innertab label::after {
+        content: "V";
+        /* background: url(images/down.png) no-repeat center center; */
+        background-size: 100% auto;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        z-index: 999;
+        width: 15px;
+        height: 15px;
+      }
+
+      .innertab label.active::after {
+        content: "^";
+        background: url(images/up.png) no-repeat center center;
+        background-size: 100% auto;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        z-index: 999;
+        width: 15px;
+        height: 15px;
+      }
+
+      .innertab .tab-content {
+        padding: 10px 10px 0 10px;
+      }
+
+      .innertab .tags-content {
+        text-align: center;
+      }
+
+      .innertab .tags-content span {
+        display: inline-block;
+        padding: 3px 10px;
+        border: 2px solid #9467bd;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -o-border-radius: 4px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .object-content ul {
+        padding: 0;
+      }
+
+      .object-content li {
+        list-style: none;
+      }
+
+      /* Accordion styles */
+
+      .clearfix:after {
+        clear: both;
+        content: " ";
+        display: block;
+        font-size: 0;
+        line-height: 0;
+        visibility: hidden;
+        width: 0;
+        height: 0;
+      }
+      .container {
+        padding: 50px;
+      }
+
+      img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <title>KGraphX Docs</title>
+  </head>
+
+  <body>
+    <div id="myHelp" class="container">
+      <div>
+        <h1>OntoEditor Documentation</h1>
+        <p style="text-align: center">
+          <a href="#Overview">Overview</a> •
+          <a href="#Architecture">Architecture</a> •
+          <a href="#Motivation">Motivation</a> •
+          <a href="#Features">Features</a> •
+          <a href="#Implementation">Implementation</a> •
+          <a href="#Installation">Installation</a> • <a href="#FAQ">FAQ</a> •
+          <a href="https://github.com/ahemaid/OntoEditor/blob/main/LICENSE"
+            >License</a
+          >
+          • <a href="mailto:ahmad.hemid@fit.fraunhofer.de">Contact</a>
+        </p>
+      </div>
+      <div id="Overview">
+        <!-- <h2><u>Overview:</u></h2>
+        <div>
+          <p style="font-size: 16px; text-align: justify">
+            The KGraphX framework was developed by leveraging the advantages of
+            previous KG building approaches and tools, specifically designed for
+            novice users. KGraphX was tailored by customizing the open-source
+            code of WebVOWL to remove unnecessary and complex functionalities
+            while introducing new features such as the creation of visually
+            appealing elements based on natural language, automated querying of
+            KGs on Wikidata and BioPortal using user search input, and
+            comprehensive listings of properties and objects associated with the
+            selected user entity. This framework encourages the reuse of
+            existing concepts and linked data from Wikidata and BioPortal.
+            Furthermore, KGraphX allows for the export of user-generated KGs
+            into RDF and RDFS formats, with the option of storing them in a
+            local RDF storage server, such as Apache Jena Fuseki Server.
+          </p>
+        </div> -->
+      </div>
+      <div id="Motivation">
+        <!-- <h2><u>Motivation:</u></h2>
+
+        <div>
+          <p>
+            The process of manually creating and maintaining knowledge graphs
+            (KGs) can be challenging, especially for large and complex KGs.
+            Popular KGs like Facebook's social graph are created through user
+            interactions instead of manual collaboration.
+          </p>
+
+          <p>
+            Semantic Web technologies such as RDF, RDFS, and OWL are used for KG
+            generation, but they require users to have a solid understanding of
+            these technologies, including their syntax and serialization. Many
+            users lack the necessary skills to implement KGs effectively.
+            Conversion tools like WebVOWL can assist, but a foundational
+            understanding of OWL and Semantic Web technologies is still
+            required.
+          </p>
+          <img
+            style="width: 50%; padding-bottom: 2%"
+            src="Images/movtivationalExample.png"
+            alt="KGraphX Architecture"
+          />
+          <p>
+            The KGraphX approach aims to simplify KG creation for users across
+            different domains. It uses natural language terms and
+            representations to make the process more intuitive. Complexities
+            like prefixes, semantic and schema terminologies, and language tags
+            are eliminated, focusing on simplified natural language properties.
+          </p>
+
+          <p>
+            To construct KGs efficiently, it is recommended to reuse existing
+            entities from external data sources like Wikidata, BioPortal, or
+            DBpedia to avoid duplication and maintain consistency. However,
+            novice users may struggle with the complexities of importing
+            entities. KGraphX addresses this by removing Semantic Web
+            complexities and providing new standards and practices suitable for
+            novices.
+          </p>
+
+          <p>
+            The KGraphX framework builds upon previous KG building approaches
+            and tools designed for novice users. It is based on WebVOWL and
+            introduces customizations to enhance user-friendliness. It
+            incorporates visually appealing elements based on natural language
+            and automates querying of KGs on Wikidata and BioPortal. Users can
+            export their generated KGs into RDF and RDFS formats, with the
+            option to store them in a local RDF storage server like Apache Jena
+            Fuseki Server.
+          </p>
+        </div> -->
+      </div>
+      <div id="Architecture"></div>
+      <div id="Architecture">
+        <!-- <h2><u>KGraphX Architecture:</u></h2>
+        <div>
+          <p style="font-size: 16px; text-align: justify">
+            The architecture of KGraphX consists of several modules and
+            components designed to serve as a Streamlined Visual KG Builder
+            specifically tailored for novice users. The main modules and
+            components are as follows:
+          </p>
+          <img
+            style="width: 50%; padding-bottom: 2%"
+            src="Images/KG_Architecture.PNG"
+            alt="KGraphX Architecture"
+          />
+        </div>
+        <h2>Main Modules and Components:</h2>
+        <ul>
+          <li>
+            <strong>Core KG Builder:</strong> As the main component of KGraphX,
+            the Core KG Builder provides all the web services for other internal
+            modules. It sends user inputs to the SPARQL Query Generator,
+            receives responses, and collects links and nodes' data for
+            serialization to an RDF store or Turtle files. It is a JavaScript
+            server-side component that runs a customized version of WebVOWL.
+          </li>
+          <li>
+            <strong>SPARQL Query Generator:</strong> Using HTTP requests, the
+            SPARQL Query Generator provides an automatic querying mechanism for
+            KGs on Wikidata and BioPortal based on user search inputs. It allows
+            users to retrieve entities and properties for reusability in the KG
+            User Interface.
+          </li>
+          <li>
+            <strong>RDF Store Fuseki Server:</strong> This server acts as a
+            repository for storing and managing RDF data associated with
+            KGraphX-created KGs. It provides centralized storage, ensuring the
+            persistence and accessibility of ontologies and RDF data. It also
+            exposes SPARQL over HTTP APIs for accessing its services.
+          </li>
+          <li>
+            <strong>Export Module:</strong> With the support of the Export
+            Module, user-developed KGs can be serialized into RDF and RDFS
+            formats. Users have the option to download them as Turtle files or
+            store them in the Fuseki server.
+          </li>
+        </ul> -->
+      </div>
+      <div id="Features">
+        <!-- <h2><u>Features:</u></h2>
+        <div>
+          <h3>Visual Elements</h3>
+          <p>
+            KGraphX focuses on making it easier for lay users to understand and
+            use the tool for knowledge graph creation. It uses visual elements
+            to represent different categories: Resource, Property, and Datatype.
+            Each element is depicted with a symbol and a natural language term,
+            making it more understandable for lay users.
+          </p>
+          <img
+            style="width: 35%; padding-bottom: 2%"
+            src="Images/visual.png"
+            alt="Visual Elements"
+          />
+
+          <h3>Building the Knowledge Graph</h3>
+          <p>
+            Resources can be created using the drag-and-drop approach. Users can
+            search for entities in Wikidata or Bioportal and create new
+            entities. The graph building process can be done with or without the
+            force layout enabled. Relations between entities can be established
+            by dragging the arrowhead to the target element. Two types of
+            properties, HasRelation and isTypeOf, can be used for creating
+            relations. Users can also reuse existing properties from Wikidata to
+            create relationships between resources.
+          </p>
+          <img
+            style="width: 70%; padding-bottom: 2%"
+            src="Images/KGraphX_Interface.png"
+            alt="KGraphX UI"
+          />
+          <h4>Wikidata and Bioportal Integration</h4>
+          <h5>Wikidata</h5>
+
+          KGraphX integrates with Wikidata using its API. Users can get search
+          suggestions and populate existing properties of an entity by invoking
+          the Wikidata API with corresponding SPARQL queries.
+
+          <h5>Bioportal</h5>
+          <p>
+            Bioportal integration requires an API key. Users can search for
+            entities and select the required entity to build the graph. The
+            resource node will be populated with the label name, and the IRI
+            value takes the URL value.
+          </p>
+
+          <h4>Export Module</h4>
+          <p>
+            KGraphX provides an export module for serializing the constructed
+            graph into RDF and RDFS formats. Users can select the export option,
+            and the content will be prepared in steps to create the header,
+            prefixes, and required syntax formats. The exported file can be
+            downloaded as a TTL format file.
+          </p>
+          <img
+            style="width: 35%; padding-bottom: 2%"
+            src="Images/exportFlowchart.png"
+            alt="Export Module"
+          />
+
+          <h4>Apache Jena Fuseki Integration</h4>
+          <p>
+            KGraphX integrates with Apache Jena Fuseki, which acts as a
+            repository for storing and managing RDF data associated with
+            KGraphX-created KGs. Users can run the Fuseki server at port 3030
+            and use it as a centralized storage solution for ontologies and RDF
+            data.
+          </p>
+        </div> -->
+      </div>
+      <div id="Implementation">
+        <!-- <h2><u>KGraphX Implementation:</u></h2>
+        <div>
+          <h3>Graph building module</h3>
+          <p>
+            This section explains basic graph building without using the search
+            functionalities. The graph building module has been reused from
+            WebVOWL is extended as per the required modifications. The entire
+            canvas area which is used for creating the graph is set to allow the
+            drag-and-drop functionality using the method
+            <em>allowDrop(event)</em> and invoking the method through the
+            <em>ondragover</em> attribute in the canvas section. Each of the
+            elements in the left side section is added as SVG elements as shown
+            in the table below:
+          </p>
+
+          <table>
+            <tr>
+              <th>Elements</th>
+              <th>SVG elements used</th>
+            </tr>
+            <tr>
+              <td>Resource</td>
+              <td>&lt;circle&gt;, &lt;text&gt;</td>
+            </tr>
+            <tr>
+              <td>HasRelation</td>
+              <td>
+                &lt;rect&gt;, &lt;marker&gt;, &lt;line&gt;, &lt;path&gt;,
+                &lt;text&gt;
+              </td>
+            </tr>
+            <tr>
+              <td>isTypeOf</td>
+              <td>&lt;line&gt;, &lt;marker&gt;, &lt;text&gt;, &lt;path&gt;</td>
+            </tr>
+            <tr>
+              <td>All datatype elements</td>
+              <td>&lt;rect&gt;, &lt;text&gt;</td>
+            </tr>
+          </table>
+
+          <p>
+            The resource element is incorporated with drag functionality and
+            upon drag start, the function
+            <em>selectThisDefaultElement(this)</em> is invoked to set the
+            currently created resource as the selection. Upon dropping the
+            resource on the graph area, the method
+            <em>modified_dblClickFunction()</em> is invoked which gets the
+            position of the drop (x coordinate, y coordinate, translation, and
+            scale factor) and creates a new node at the given location with the
+            label "NewResource" and an IRI of ":NewResource + enum value of the
+            resource".
+          </p>
+
+          <p>
+            Each Resource node in the graph is incorporated with the following
+            functionalities that appear upon hovering over the node:
+          </p>
+          <ol>
+            <li>
+              '+' : upon clicking adds the selected datatype element from the
+              left side section.
+            </li>
+            <li>'x' : upon clicking deletes the node.</li>
+            <li>
+              An arrow drag option that can be clicked and dragged to the other
+              node with which a connection can be established.
+            </li>
+          </ol>
+
+          <p>
+            Upon arrow drag start, the x and y coordinates of the corresponding
+            node is noted, and on dragged event, the coordinates are considered
+            as the target position, and the
+            <em>createNewObjectProperty</em> function is invoked by passing the
+            domain, range, and arrow end position. The algorithm for
+            establishing the link is given below:
+          </p>
+
+          <pre>
+            <code>
+         function createNewObjectProperty() {
+            if (selectedProperty === 'HasRelation') {
+                // Set the label as HasRelation
+                // Push the id, domain, range, label, and IRI to an array object
+                // Create the HasRelation property editable SVG between the domain and range nodes
+            } else {
+                // Set the label as isTypeOf
+                // Push the id, domain, range, label, and IRI to an array object
+                // Create the isTypeOf property editable SVG between the domain and range nodes
+            }
+        }
+            </code>
+            </pre>
+
+          <h3>Search module</h3>
+          <p>
+            This module focuses on implementing the search functionality in the
+            graph. The search is based on the label or IRI of the nodes. The
+            user enters a keyword in the search input field, and upon clicking
+            the search button, the function <em>searchFunction()</em> is
+            invoked. The algorithm for the search functionality is as follows:
+          </p>
+
+          <pre>
+            <code>
+        function searchFunction() {
+            let searchInput = document.getElementById('searchInput').value;
+            let searchResults = [];
+        
+            // Iterate over all nodes in the graph
+            // Check if the label or IRI matches the search input
+            // If yes, push the node to the searchResults array
+        
+            // Highlight the searchResults nodes in the graph
+        }
+            </code>
+            </pre>
+
+          <h3>Layout module</h3>
+          <p>
+            This module focuses on arranging the nodes in the graph to achieve
+            an aesthetically pleasing layout. The algorithm used is a
+            force-directed layout algorithm, which simulates the forces between
+            nodes and iteratively adjusts their positions to achieve
+            equilibrium. The layout algorithm is as follows:
+          </p>
+
+          <pre>
+            <code>
+        function layoutAlgorithm() {
+            // Initialize the positions of all nodes randomly
+            // Set up a simulation with parameters like repulsion force, attraction force, and damping
+        
+            // Iterate for a certain number of iterations or until the system reaches equilibrium
+            // Calculate the forces between nodes based on their positions and properties
+            // Update the positions of nodes based on the forces
+        
+            // Update the positions of SVG elements in the graph based on the updated node positions
+        }
+            </code>
+            </pre>
+        </div>
+        <div>
+          <h3>Export module</h3>
+          <p>
+            The export module covers the logic for exporting the knowledge
+            graphs in TTL format in RDF and S serializations. It is organized in
+            two separate files <em>exportMenu.js</em> and
+            <em>exportTTLModule.js</em>.
+          </p>
+          <figure>
+            <img
+              style="width: 50%; padding-bottom: 2%"
+              src="Images/exportUML.png"
+              alt="UML Diagram for  RDF and RDFS serialization"
+            />
+            <!-- <figcaption style="text-align: center">UML Diagram for  RDF and RDFS serialization</figcaption> -->
+          </figure>
+          <p>
+            The process flow for syntax construction involves multiple modules:
+          </p>
+          <ul>
+            <li>
+              <strong>Export Menu:</strong> The export menu is added in the
+              footer section with options for <em>Export as RDF</em>,
+              <em>Export as RDFS</em>, <em>Upload TTL file to Fuseki</em>, and
+              <em>Upload current graph to Fuseki</em>. It sets the file name and
+              file type for the download functionality.
+            </li>
+            <li>
+              <strong>Prepare headers and prefix list:</strong> The content for
+              the TTL file is constructed in various steps. It begins with two
+              functions, <em>prepareHeader()</em> and
+              <em>preparePrefixList()</em>, that add the required text to the
+              header section and set the required prefixes for the syntax,
+              respectively. <em>preparePrefixRepresentation()</em> prepares the
+              IRI values of each of the nodes and links in the graph.
+            </li>
+            <li>
+              <strong>Get Resource and Property data:</strong> For the graph
+              drawn, the node and link details are fetched and the data is
+              stored in an object. This provides all the required data regarding
+              the resources and properties have been drawn in the graph in two
+              separate objects, which can be used to construct the required
+              serializations.
+            </li>
+            <li>
+              <strong>Constructing the RDF syntax:</strong> The RDF syntax is
+              constructed by setting the subject, predicate, and object values
+              into the resultant content. Since the elements are represented in
+              the prefix formats, which are their IRI values, for better
+              understanding, each of the element's label is added using the
+              property
+              <code>&lt;http://www.w3.org/2006/vcard/ns#hasFN&gt;</code>. The
+              resulting content is received at the main export module, which is
+              included in the content for download.
+            </li>
+            <li>
+              <strong>Constructing the RDFS Format:</strong> Similar to RDF
+              syntax construction, the RDFS syntax generation also follows a
+              similar structure. In this case, there are two separate methods to
+              construct the schema for properties and resources in a triple
+              structure. The obtained results from the two functions are
+              appended and added to the contents to be exported.
+            </li>
+          </ul>
+        </div> -->
+      </div>
+      <div id="Installation">
+        <!-- <h2><u>Installation:</u></h2>
+        <div>
+          <h3>Requirements</h3>
+          <ul>
+            <li>
+              Node.js for installing the development tools and dependencies from
+              <a href="https://nodejs.org/en">here</a>.
+            </li>
+            <li>
+              Java Runtime Kit (JRE) or Java Development Kit (JDK) >= version
+              11.
+            </li>
+          </ul>
+          <h3>KGraphX Installation</h3>
+          <ol>
+            <li>Navigate to the root folder.</li>
+            <li>
+              Run <code>npm install --force</code> to install the dependencies
+              and build the project.
+            </li>
+            <li>
+              Run <code>npm install grunt-cli -g</code> to install the npm
+              package <code>grunt-cli</code> globally.
+            </li>
+            <li>
+              Run <code>grunt webserver</code> to start a local live-updating
+              web server.
+            </li>
+          </ol>
+          <h3>Fuseki Server Installation</h3>
+          <ol>
+            <li>
+              You can download the latest version normally under their
+              <a href="https://jena.apache.org/download/index.cgi">website</a>
+              or download the Fuseki server with the following command for Linux
+              machines. For Windows, the website has a Windows version
+              <a
+                href="https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-4.8.0.zip"
+                >here</a
+              >:
+            </li>
+            <pre><code>wget https://downloads.apache.org/jena/binaries/apache-jena-fuseki-4.8.0.tar.gz</code></pre>
+            <li>Extract the compressed file.</li>
+            <li>Find the location of "apache-jena-fuseki-4.8.0".</li>
+            <li>Login to the terminal under the extracted folder.</li>
+            <li>Run Fuseki using the following command:</li>
+            <pre><code>./fusekiserver --update --mem --port=3030 /dataset</code></pre>
+            <li>
+              Fuseki server GUI is accessible at
+              <a href="http://localhost:3030/">http://localhost:3030/</a> and as
+              a default "dataset" will be used. Please remember to use it when
+              exporting RDF/RDFS to the Fuseki server..
+            </li>
+          </ol>
+          <h3>Running Using Docker</h3>
+          <ol>
+            <li>
+              You can also run KGraphX using docker, If you have it installed on
+              your machine, otherwise, you use
+              <a href="https://docs.docker.com/engine/install/">this</a>
+              to install docker. Once you have docker, then you can issue the
+              following command to download the KGraphX docker image:
+            </li>
+            <pre><code>docker pull ahemid/kgraphx</code></pre>
+            or you can create KGraphX docker image by giving the following
+            command on the project root folder:
+            <pre><code>docker build .  -t ahemid/kgraphx</code></pre>
+            <li>
+              Next, create the KGraphX docker container using the following
+              command:
+              <pre><code>docker run -d -p 8000:8000 -p 3030:3030 ahemid/kgraphx </code></pre>
+            </li>
+            <li>
+              Then, KGraphX GUI is accessible at
+              <a href="http://localhost:8000/">http://localhost:8000/</a> and
+              the Fuseki server is running at
+              <a href="http://localhost:3030/">http://localhost:3030/</a>
+            </li>
+          </ol>
+        </div>
+      </div> -->
+      <div id="FAQ">
+        <!-- <h2><u>Frequently Asked Questions for KGraphX Usage:</u></h2>
+        <div>
+          <div>
+            <b style="font-size: 16px"
+              >1. Selecting the required data store for search</b
+            >
+          </div>
+          <ul>
+            <li>
+              Select Wikidata or Bioportal from the dropdown in the left sidebar
+            </li>
+          </ul>
+          <img
+            style="width: 25%; padding-bottom: 2%"
+            src="Images/dropdown.PNG"
+            alt="Datastore selection"
+          />
+        </div>
+        <div>
+          <div>
+            <b style="font-size: 16px"
+              >2. How do I create a resource and search for existing elements
+              from the selected datastore?</b
+            >
+          </div>
+          <ul>
+            <li>Drag and drop a resource from the left sidebar</li>
+            <li>Double click on the element</li>
+            <li>Type inside the search box</li>
+            <li>
+              Select an element from the search results and you can find the
+              results under Property details on the right side
+            </li>
+          </ul>
+          <img
+            style="padding-bottom: 2%"
+            src="Images/Resource.gif"
+            alt="Resource creation"
+          />
+        </div>
+        <div>
+          <div>
+            <b style="font-size: 16px">3. How do I create a new entity?</b>
+          </div>
+          <ul>
+            <li>Drag and drop a resource from the left sidebar</li>
+            <li>Double click on the element</li>
+            <li>Type the name you would like to add to the new entity</li>
+            <li>Click on the "create new entity" button</li>
+          </ul>
+        </div>
+        <div>
+          <div>
+            <b style="font-size: 16px"
+              >4. How to find existing properties between 2 entities?</b
+            >
+          </div>
+          <ul>
+            <li>
+              Create 2 resources and connect them with the "hasRelation"
+              property
+            </li>
+            <li>Double click on the property box</li>
+            <li>
+              Any existing relation between the entities will be displayed in
+              the pop-up else create a new property using the "Create new
+              property" button
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div>
+            <b style="font-size: 16px"> 5. How to export TTL as RDF/RDFS?</b>
+          </div>
+          <ul>
+            <li>
+              Once the graph is constructed, select the option of "Export as
+              RDF" or "Export as RDFS" under the Export/Save tab in the footer.
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div>
+            <b style="font-size: 16px">
+              6. How to add the graph or TTL to Apache Jena Fuseki server?</b
+            >
+          </div>
+          <ul>
+            <li>
+              Once the graph is constructed, if you directly wish to upload the
+              current graph, select "Upload current graph to Fuseki" by entering
+              the dataset name on your Fuseki server, which has "dataset" as its
+              default value.
+            </li>
+            <li>
+              If you wish to upload a TTL file, select "Upload TTL file to
+              Fuseki" by entering the dataset name on your Fuseki server.
+              "dataset" is the default value if you have used the given
+              installation instructions.
+            </li>
+          </ul>
+        </div>
+      </div> -->
+    </div>
+  </body>
+</html>
