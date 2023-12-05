@@ -13,6 +13,19 @@
   <a href="https://github.com/ahemaid/OntoEditor/blob/main/LICENSE">License</a>
 </p>
 
+OntoEditor is an Online Collaborative Ontology Editor, built on Distributed
+Version Control Systems. It aims to support collaborative ontology development
+across different RDF serialization formats: Turtle, JSON-LD, and RDF/XML.
+
+Requirements
+------------
+Node.js for installing the development tools and dependencies form [here](https://nodejs.org/en).
+
+KGraphX Installation
+-----------------
+
+Running Using Docker
+-----------------
 
 ## License
 Copyright © 2023 Fraunhofer. This project is licensed under the MIT License - see the
