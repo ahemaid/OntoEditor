@@ -23,6 +23,10 @@ Node.js for installing the development tools and dependencies form [here](https:
 
 OntoEditor Installation
 -----------------
+1. Navigate to the root folder.
+2. Run `npm install` to install the dependencies and build the project
+3. Run `npm start` to run and execute the project 
+4. OntoEditor GUI will be accessible at http://localhost:5000/
 
 Running Using Docker
 -----------------
