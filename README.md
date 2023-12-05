@@ -21,7 +21,7 @@ Requirements
 ------------
 Node.js for installing the development tools and dependencies form [here](https://nodejs.org/en).
 
-KGraphX Installation
+OntoEditor Installation
 -----------------
 
 Running Using Docker
