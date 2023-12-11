@@ -8,11 +8,12 @@
     />
     <meta
       name="keywords"
-      content="KGraphX, vowl, visual notation, web ontology language, owl, rdf, ontology visualization, ontologies, semantic web"
+      content="OntoEditor, Real-time collaboration, RDF serialization, Version Control Systems, Git integration, Error detection, Syntax validation,
+      Ontology development, ontologies, semantic web"
     />
     <meta
       name="description"
-      content="KGraphX - Web-based Visualization of Ontologies"
+      content="OntoEditor - Web-based Visualization of Ontologies"
     />
     <meta name="robots" content="noindex,nofollow" />
     <meta
@@ -392,7 +393,7 @@ ______________________*/
       }
     </style>
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <title>KGraphX Docs</title>
+    <title>OntoEditor Docs</title>
   </head>
 
   <body>
@@ -413,127 +414,122 @@ ______________________*/
         </p>
       </div>
       <div id="Overview">
-        <!-- <h2><u>Overview:</u></h2>
+        <h2><u>Overview:</u></h2>
         <div>
           <p style="font-size: 16px; text-align: justify">
-            The KGraphX framework was developed by leveraging the advantages of
-            previous KG building approaches and tools, specifically designed for
-            novice users. KGraphX was tailored by customizing the open-source
-            code of WebVOWL to remove unnecessary and complex functionalities
-            while introducing new features such as the creation of visually
-            appealing elements based on natural language, automated querying of
-            KGs on Wikidata and BioPortal using user search input, and
-            comprehensive listings of properties and objects associated with the
-            selected user entity. This framework encourages the reuse of
-            existing concepts and linked data from Wikidata and BioPortal.
-            Furthermore, KGraphX allows for the export of user-generated KGs
-            into RDF and RDFS formats, with the option of storing them in a
-            local RDF storage server, such as Apache Jena Fuseki Server.
+            Online Collaborative Ontology Editor (OntoEditor) on top of Distributed Version Control Systems is 
+            an approach towards supporting collaborative
+            developing ontologies with syntax parsing in different RDF serialization formats,
+            such as Turtle, Json-LD, and RDF/XML.
           </p>
-        </div> -->
+        </div>
       </div>
       <div id="Motivation">
-        <!-- <h2><u>Motivation:</u></h2>
+         <h2><u>Motivation:</u></h2>
 
         <div>
           <p>
-            The process of manually creating and maintaining knowledge graphs
-            (KGs) can be challenging, especially for large and complex KGs.
-            Popular KGs like Facebook's social graph are created through user
-            interactions instead of manual collaboration.
+            John, Robert, and Lisa, experienced ontology engineers, face challenges in 
+            collaborative ontology development. Current tools lack real-time collaboration, syntax checking,
+             and efficient communication. To streamline this, we've devised a solution enabling real-time collaborative editing,
+              live syntax checking, and instant communication. 
           </p>
 
           <p>
-            Semantic Web technologies such as RDF, RDFS, and OWL are used for KG
-            generation, but they require users to have a solid understanding of
-            these technologies, including their syntax and serialization. Many
-            users lack the necessary skills to implement KGs effectively.
-            Conversion tools like WebVOWL can assist, but a foundational
-            understanding of OWL and Semantic Web technologies is still
-            required.
+            Users work on a shared document, seeing each other's changes, 
+            cursor positions, and syntax errors in real-time. Discussions happen through live chat, resolving errors collaboratively. 
+            Only authorized users can commit changes to the remote repository. This approach simplifies collaboration, 
+          ensuring real-time error detection and synchronization with the remote repository.
           </p>
           <img
             style="width: 50%; padding-bottom: 2%"
-            src="Images/movtivationalExample.png"
+            src="Images/motivation.png"
             alt="KGraphX Architecture"
           />
-          <p>
-            The KGraphX approach aims to simplify KG creation for users across
-            different domains. It uses natural language terms and
-            representations to make the process more intuitive. Complexities
-            like prefixes, semantic and schema terminologies, and language tags
-            are eliminated, focusing on simplified natural language properties.
-          </p>
-
-          <p>
-            To construct KGs efficiently, it is recommended to reuse existing
-            entities from external data sources like Wikidata, BioPortal, or
-            DBpedia to avoid duplication and maintain consistency. However,
-            novice users may struggle with the complexities of importing
-            entities. KGraphX addresses this by removing Semantic Web
-            complexities and providing new standards and practices suitable for
-            novices.
-          </p>
-
-          <p>
-            The KGraphX framework builds upon previous KG building approaches
-            and tools designed for novice users. It is based on WebVOWL and
-            introduces customizations to enhance user-friendliness. It
-            incorporates visually appealing elements based on natural language
-            and automates querying of KGs on Wikidata and BioPortal. Users can
-            export their generated KGs into RDF and RDFS formats, with the
-            option to store them in a local RDF storage server like Apache Jena
-            Fuseki Server.
-          </p>
-        </div> -->
+ 
+        </div> 
       </div>
       <div id="Architecture"></div>
       <div id="Architecture">
-        <!-- <h2><u>KGraphX Architecture:</u></h2>
+         <h2><u>OntoEditor Architecture and Workflow:</u></h2>
         <div>
           <p style="font-size: 16px; text-align: justify">
-            The architecture of KGraphX consists of several modules and
-            components designed to serve as a Streamlined Visual KG Builder
-            specifically tailored for novice users. The main modules and
-            components are as follows:
-          </p>
+            The architecture of OntoEditor consists of several components designed to serve as a Streamlined Visual KG Builder
+            specifically tailored for novice users. The main components are can be seen below in the coming diagram.          </p>
           <img
             style="width: 50%; padding-bottom: 2%"
-            src="Images/KG_Architecture.PNG"
+            src="Images/collabImplementation.png"
             alt="KGraphX Architecture"
           />
         </div>
-        <h2>Main Modules and Components:</h2>
+        <h2>Main Components:</h2>
         <ul>
           <li>
-            <strong>Core KG Builder:</strong> As the main component of KGraphX,
-            the Core KG Builder provides all the web services for other internal
-            modules. It sends user inputs to the SPARQL Query Generator,
-            receives responses, and collects links and nodes' data for
-            serialization to an RDF store or Turtle files. It is a JavaScript
-            server-side component that runs a customized version of WebVOWL.
+            <strong>Editor:</strong> CodeMirror  as a JavaScript-based Editor was selected for its robust programmable API and
+             advanced editing capabilities like
+            auto-indentation, auto-completion, syntax highlighting, and search functionalities. 
+            As an open-source editor widely used in various projects, CodeMirror inherently supports syntax highlighting for 
+            over a hundred programming languages,
+            including Turtle, XML, and JSON-LD. Crucially, it enables collaboration by
+            detecting changes through onChange events
           </li>
           <li>
-            <strong>SPARQL Query Generator:</strong> Using HTTP requests, the
-            SPARQL Query Generator provides an automatic querying mechanism for
-            KGs on Wikidata and BioPortal based on user search inputs. It allows
-            users to retrieve entities and properties for reusability in the KG
-            User Interface.
+            <strong>Real-Time Communication Channel:</strong> Real-time communication is vital for
+            collaborative editing. WebSocket [6] technology enables immediate and bidirectional data exchange between web browsers
+             (clients) and servers, facilitating seamless interactions. Upon initiating document editing, 
+             a WebSocket connection is established. This channel relays all modifications to the server, managing
+            live chat, user details, cursor positions, and notifications among connected users.
           </li>
           <li>
-            <strong>RDF Store Fuseki Server:</strong> This server acts as a
-            repository for storing and managing RDF data associated with
-            KGraphX-created KGs. It provides centralized storage, ensuring the
-            persistence and accessibility of ontologies and RDF data. It also
-            exposes SPARQL over HTTP APIs for accessing its services.
+            <strong>ShareDB:</strong> To enable seamless collaboration, a real-time database was imperative. 
+            After careful research, ShareDB 2
+            emerged as the optimal choice. ShareDB,
+            The below figure shows OntoEditor’s Workflow. The diagram illustrates the authentication
+            process in Git, file selection, and the initiation of RDF editing. It highlights the
+            collaborative nature facilitated by a unique shareable link, enabling simultaneous
+            editing and syntax checking. Completed changes can be committed and pushed
+            to the remote repository.
+            built on Operational Transformation, operates as a real-time in-memory
+            database. It stores JavaScript objects on the server and facilitates their sharing among multiple clients through WebSockets.
+             Documents in ShareDB include
+            properties like Version (incrementing from 0), Type (e.g., OT-text, OT-json1),
+            and Data which is the intended content for storage within the database.
+            Algorithm 1 was designed to operationalize this approach. Upon a user’s initiation of RDF document editing,
+             a new document with an initial version of 0 and
+            the RDF data to be inserted is created in ShareDB. If the document already
+            exists in ShareDB, its existing path is returned to the user. For Operational
+            Transformation, we leverage Plain text Operational Transformation. This Operational Transformation type is utilized for editing plain text documents and
+            supports operations including skipping forward N characters, inserting str at the
+            current position, and deleting N characters at the current position.
+            Clients subscribe to ShareDB documents, updating the document’s state
+            with insertions and deletions by modifying the index position and content. Each
+            change increments the version number and is stored in ShareDB. These operations are transmitted over WebSockets, 
+            updating connected clients’ local document states.
+            
           </li>
           <li>
-            <strong>Export Module:</strong> With the support of the Export
-            Module, user-developed KGs can be serialized into RDF and RDFS
-            formats. Users have the option to download them as Turtle files or
-            store them in the Fuseki server.
+            <strong>RDF Validator:</strong> OntoEditor utilizes JavaScript parser libraries for real-time validation of var-
+            ious RDF serialization formats (Turtle, RDF/XML, JSON-LD). Users receive
+            instantaneous error messages and can rectify syntax errors seamlessly during
+            editing. To validate RDF, established parsers are employed: N3.js for Turtle,
+            RDF/XML streaming parser 2 for RDF/XML, and JSON-LD streaming parser 
+            for JSON-LD. These parsers operate in a streaming manner, ensuring efficient
+            handling of large documents with limited memory.
+            During the editing process, users can select their desired format. The chosen
+            parser is activated accordingly, integrated with an onChange function to auto-
+            matically check syntax while typing. The syntax checker can be toggled on or off,
+            with default activation. The syntax checker identifies the format from the URL
+            path and calls the corresponding parser. Parsing occurs in a streaming manner,
+            providing parsed triples and highlighting any syntax errors. Meaningful error
+            messages are displayed atop the editor for immediate user visibility. Upon error
+            correction, a ’Syntax correct, all triples parsed successfully’ message is shown
           </li>
-        </ul> -->
+        </ul>
+        <img
+        style="width: 50%; padding-bottom: 2%"
+        src="Images/FlowChart.png"
+        alt="KGraphX Architecture"
+      />
       </div>
       <div id="Features">
         <!-- <h2><u>Features:</u></h2>
@@ -765,7 +761,7 @@ ______________________*/
               src="Images/exportUML.png"
               alt="UML Diagram for  RDF and RDFS serialization"
             />
-            <!-- <figcaption style="text-align: center">UML Diagram for  RDF and RDFS serialization</figcaption> -->
+             <figcaption style="text-align: center">UML Diagram for  RDF and RDFS serialization</figcaption> 
           </figure>
           <p>
             The process flow for syntax construction involves multiple modules:
