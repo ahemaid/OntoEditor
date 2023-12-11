@@ -30,7 +30,19 @@ OntoEditor Installation
 
 Running Using Docker
 -----------------
-
+1. You can also run OntoEditor using docker, If you have it installed on your machine, otherwise, you use [this](https://docs.docker.com/engine/install/) to install docker. Once you have docker, then you can issue the following command to download the OntoEditor docker image:
+```
+docker pull ahemid/ontoeditor
+```
+or you can create an OntoEditor docker image by giving the following command on the project root folder:
+```
+docker build .  -t ahemid/ontoeditor
+```
+2. Next, create the OntoEditor docker container using the following command: 
+```
+docker run -d -p 5000:5000 -p 8080:8080 ahemid/ontoeditor
+```
+3. Then, OntoEditor GUI is accessible at http://localhost:5000/ 
 ## License
 Copyright © 2023 Fraunhofer. This project is licensed under the MIT License - see the
 [LICENSE](LICENSE) for details.
