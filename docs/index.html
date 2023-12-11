@@ -404,12 +404,13 @@ ______________________*/
           <a href="#Overview">Overview</a> •
           <a href="#Architecture">Architecture</a> •
           <a href="#Motivation">Motivation</a> •
-          <a href="#Features">Features</a> •
+          <!-- <a href="#Features">Features</a> • -->
           <a href="#Implementation">Implementation</a> •
-          <a href="#Installation">Installation</a> • <a href="#FAQ">FAQ</a> •
+          <a href="#Installation">Installation</a> •
+           <!-- <a href="#FAQ">FAQ</a> • -->
+          <a href="https://github.com/ahemaid/OntoEditor">Source Code</a> •
           <a href="https://github.com/ahemaid/OntoEditor/blob/main/LICENSE"
-            >License</a
-          >
+            >License</a>
           • <a href="mailto:ahmad.hemid@fit.fraunhofer.de">Contact</a>
         </p>
       </div>
@@ -531,7 +532,7 @@ ______________________*/
         alt="KGraphX Architecture"
       />
       </div>
-      <div id="Features">
+      <!-- <div id="Features"> -->
         <!-- <h2><u>Features:</u></h2>
         <div>
           <h3>Visual Elements</h3>
@@ -602,113 +603,127 @@ ______________________*/
             data.
           </p>
         </div> -->
-      </div>
+      <!-- </div> -->
       <div id="Implementation">
-        <!-- <h2><u>KGraphX Implementation:</u></h2>
+        <h2><u>OntoEditor Implementation:</u></h2>
         <div>
-          <h3>Graph building module</h3>
           <p>
-            This section explains basic graph building without using the search
-            functionalities. The graph building module has been reused from
-            WebVOWL is extended as per the required modifications. The entire
-            canvas area which is used for creating the graph is set to allow the
-            drag-and-drop functionality using the method
-            <em>allowDrop(event)</em> and invoking the method through the
-            <em>ondragover</em> attribute in the canvas section. Each of the
-            elements in the left side section is added as SVG elements as shown
-            in the table below:
+             Referencing the following Figure
+, OntoEditor has 3 modules. The first module is responsible for remote repository
+communication, the second module is responsible for enabling collaboration and
+finally the third module is responsible for syntax validation.
+
+          </p>
+          <img
+style="width: 50%; padding-bottom: 2%"
+src="Images/impModules.png"
+alt="OntoEditor"
+/>
+          <h3> Repository Communication:</h3>
+          <p>
+            Given the requirement to provide a low-threshold access to the repository, we decided to prioritize the availability 
+            of a web interface over the underlying version ntrol system. GitHub, Gitlab and Bitbucket, these three 
+            repository hosting services
+             provide a RESTFUL API architecture. By consuming REST API’s, we allow
+            users to communicate directly with their repository. This is useful especially for
+            those users who prefer editing RDF in a web based client and don’t want to install
+            GIT in their local machines.
+            In order to take advantage of OntoEditor, users have to authenticate themselves
+            with these repository hosting services. The authentication can be based on the
+            username, password or personal access token. Since with Github and Gitlab, the
+            authentication is only possible with a personal access token as they do not provide
+            support for the username or password authentication anymore. The Bitbucket users
+            can still take advantage of both authentication methods. After authentication,
+            we show users the list of their repositories and all the branches in the respective
+            repository. A typical fetch request is shown in the below Fetching Script. . Here we call the Gitlab
+            Rest API to get the projects/repositories of a user whose credentials are passed in
+            headers of request.
+            <p>
+              <pre>
+                <code>
+                  //Fetching Script: Fetching repositories of user
+                  fetch (" https :// gitlab .com/api/v4/ projects ? owned = true ", {
+                    headers : { Authorization : " Bearer " + token } ,
+                    })
+                    . then ( function ( response ) {
+                    if ( response .ok) {
+                    response . json () . then (( data ) = > {
+                    res . status (200) . json ({ repos : data }) ;
+                    }) ;
+                    } else {
+                    res . status (400) . json ({ err : response . statusText }) ;
+                    }
+                    })
+                    . catch ( function ( error ) {
+                    res. status (400) . json ({ err : error . statusText }) ;
+                    }) ;
+                    
+                </code>
+                </pre>
+            The files are then filtered based on the file format. We will only show files with
+extensions (’.ttl’), (’.rdfxml’), (’.jsonld’), (’.rdf’), (’.json’) and (’.txt’). All the other
+files in the repository will be ignored. We allow the users to add new files in their
+repository if they want to start building an ontology from scratch. Further, a delete
+file option is also available if they want to delete any of their files. The coming Figure 
+shows list of repositories and files returned by Github and how we display them
+in dropdown menus. Based on the user selection, we get the file and display it on
+our web frontend that they can use to start the editing process. After developing
+the ontology they can commit their changes to the repository. Users can share
+their editing link with other users but for committing changes, the authentication
+is always required and only those users will be able to commit, who have access to
+that respective repository.
+</p>
+
+ 
+<img
+style="width: 30%;  padding-bottom: 2%"
+src="Images/repo-info.JPG"
+alt="OntoEditor"
+/>
+<p>
+
+A scenario can happen when user A edits the file from the repository directly. This
+will update the SHA1 of their file, and if user B is already editing on our editor,
+then there could be a GIT conflict. Since, while committing we completely push
+the new content which will replace the complete file on the repository. We wanted
+the user to be able to see if there are any new commits in their repository. For this,
+we keep checking the history of file in an interval of 60 seconds, and manifest it on
+the editor with the name of the last committer and the time of the last commit.
+This way, the user can know if there have been any new changes.
+Nevertheless, if the user wants to commit the file, we show them diff screen while
+making use of <a href="https://mergely.com/ ">Mergely </a> Javascript library. We then show the difference between the
           </p>
 
-          <table>
-            <tr>
-              <th>Elements</th>
-              <th>SVG elements used</th>
-            </tr>
-            <tr>
-              <td>Resource</td>
-              <td>&lt;circle&gt;, &lt;text&gt;</td>
-            </tr>
-            <tr>
-              <td>HasRelation</td>
-              <td>
-                &lt;rect&gt;, &lt;marker&gt;, &lt;line&gt;, &lt;path&gt;,
-                &lt;text&gt;
-              </td>
-            </tr>
-            <tr>
-              <td>isTypeOf</td>
-              <td>&lt;line&gt;, &lt;marker&gt;, &lt;text&gt;, &lt;path&gt;</td>
-            </tr>
-            <tr>
-              <td>All datatype elements</td>
-              <td>&lt;rect&gt;, &lt;text&gt;</td>
-            </tr>
-          </table>
+
 
           <p>
-            The resource element is incorporated with drag functionality and
-            upon drag start, the function
-            <em>selectThisDefaultElement(this)</em> is invoked to set the
-            currently created resource as the selection. Upon dropping the
-            resource on the graph area, the method
-            <em>modified_dblClickFunction()</em> is invoked which gets the
-            position of the drop (x coordinate, y coordinate, translation, and
-            scale factor) and creates a new node at the given location with the
-            label "NewResource" and an IRI of ":NewResource + enum value of the
-            resource".
-          </p>
+            two files and provide options to merge the content line by line or entirely. Inspired
+            by how Visual Studio handles GIT conflict, we decided to implement this feature.
+            The user can then see the latest file on the repository and the local editor state
+            of the document in a side by side comparison. They can compare the parts to be
+            merged or replaced before committing. As shown in the below Figure , user B was editing
+            in our editor whilst user A pushed some new changes from Github directly. We
+            then show a merge screen to user B where they can select the changes they want to
+            keep or discard before committing them.
+                    </p>
 
+                    <img
+                    style="width: 50%; padding-bottom: 2%"
+                    src="Images/mergely.png"
+                    alt="OntoEditor"
+                  />
+
+
+
+          <h3>Collaboration</h3>
           <p>
-            Each Resource node in the graph is incorporated with the following
-            functionalities that appear upon hovering over the node:
-          </p>
-          <ol>
-            <li>
-              '+' : upon clicking adds the selected datatype element from the
-              left side section.
-            </li>
-            <li>'x' : upon clicking deletes the node.</li>
-            <li>
-              An arrow drag option that can be clicked and dragged to the other
-              node with which a connection can be established.
-            </li>
-          </ol>
-
-          <p>
-            Upon arrow drag start, the x and y coordinates of the corresponding
-            node is noted, and on dragged event, the coordinates are considered
-            as the target position, and the
-            <em>createNewObjectProperty</em> function is invoked by passing the
-            domain, range, and arrow end position. The algorithm for
-            establishing the link is given below:
+            The collaboration service is implemented as a separate module which communicates 
+            over Websocket traffic rather than HTTP traffic. Due to a large number of
+            editing operations, the idea was to extract the complexity of collaboration into an
+            independent microservice.
           </p>
 
-          <pre>
-            <code>
-         function createNewObjectProperty() {
-            if (selectedProperty === 'HasRelation') {
-                // Set the label as HasRelation
-                // Push the id, domain, range, label, and IRI to an array object
-                // Create the HasRelation property editable SVG between the domain and range nodes
-            } else {
-                // Set the label as isTypeOf
-                // Push the id, domain, range, label, and IRI to an array object
-                // Create the isTypeOf property editable SVG between the domain and range nodes
-            }
-        }
-            </code>
-            </pre>
-
-          <h3>Search module</h3>
-          <p>
-            This module focuses on implementing the search functionality in the
-            graph. The search is based on the label or IRI of the nodes. The
-            user enters a keyword in the search input field, and upon clicking
-            the search button, the function <em>searchFunction()</em> is
-            invoked. The algorithm for the search functionality is as follows:
-          </p>
-
-          <pre>
+          <!-- <pre>
             <code>
         function searchFunction() {
             let searchInput = document.getElementById('searchInput').value;
@@ -721,52 +736,49 @@ ______________________*/
             // Highlight the searchResults nodes in the graph
         }
             </code>
-            </pre>
+            </pre> -->
 
-          <h3>Layout module</h3>
+          <h3>RDF Validation and Error Reporting</h3>
           <p>
-            This module focuses on arranging the nodes in the graph to achieve
-            an aesthetically pleasing layout. The algorithm used is a
-            force-directed layout algorithm, which simulates the forces between
-            nodes and iteratively adjusts their positions to achieve
-            equilibrium. The layout algorithm is as follows:
+            we will be using JavaScript parser libraries for validating
+            different RDF serialization formats. While starting the editing process, a user can
+            select ”turtle”, ”rdf/xml”, or ”jsonld” format. Based on the user’s selection we
+            will use a parser for that serialization format. Just like we used onChange function
+            for insertion and deletion, we will also connect our syntax checker function with
+            it. This will ensure that every time a user types something, the syntax is checked
+            automatically. The user can choose to enable or disable the syntax checker, which
+            by default is always activated.
+            Syntax checker functions first detects the format from the URL path of the RDF
+            serialization format. Contingent upon the format, we call the parser for that specific
+            format. All the content in the document is then passed to our parser. Parser then
+            parses the input in a streaming way, and returns us parsed triples and any syntax
+            errors in the input. We display meaningful error messages on top of the editor in
+            order that the user can read them anytime. As soon as the user corrects the error,
+            a success message is displayed ”All triples are parsed, Syntax correct”.
           </p>
 
-          <pre>
-            <code>
-        function layoutAlgorithm() {
-            // Initialize the positions of all nodes randomly
-            // Set up a simulation with parameters like repulsion force, attraction force, and damping
-        
-            // Iterate for a certain number of iterations or until the system reaches equilibrium
-            // Calculate the forces between nodes based on their positions and properties
-            // Update the positions of nodes based on the forces
-        
-            // Update the positions of SVG elements in the graph based on the updated node positions
-        }
-            </code>
-            </pre>
         </div>
-        <div>
+        <!-- <div>
           <h3>Export module</h3>
           <p>
             The export module covers the logic for exporting the knowledge
             graphs in TTL format in RDF and S serializations. It is organized in
             two separate files <em>exportMenu.js</em> and
             <em>exportTTLModule.js</em>.
-          </p>
-          <figure>
+          </p> -->
+
+          <!-- <figure>
             <img
               style="width: 50%; padding-bottom: 2%"
               src="Images/exportUML.png"
               alt="UML Diagram for  RDF and RDFS serialization"
             />
              <figcaption style="text-align: center">UML Diagram for  RDF and RDFS serialization</figcaption> 
-          </figure>
-          <p>
+          </figure> -->
+          <!-- <p>
             The process flow for syntax construction involves multiple modules:
-          </p>
-          <ul>
+          </p> -->
+          <!-- <ul>
             <li>
               <strong>Export Menu:</strong> The export menu is added in the
               footer section with options for <em>Export as RDF</em>,
@@ -810,11 +822,11 @@ ______________________*/
               structure. The obtained results from the two functions are
               appended and added to the contents to be exported.
             </li>
-          </ul>
-        </div> -->
+          </ul> -->
+        <!-- </div>  -->
       </div>
       <div id="Installation">
-        <!-- <h2><u>Installation:</u></h2>
+        <h2><u>Installation:</u></h2>
         <div>
           <h3>Requirements</h3>
           <ul>
@@ -822,28 +834,27 @@ ______________________*/
               Node.js for installing the development tools and dependencies from
               <a href="https://nodejs.org/en">here</a>.
             </li>
-            <li>
+            <!-- <li>
               Java Runtime Kit (JRE) or Java Development Kit (JDK) >= version
               11.
-            </li>
+            </li> -->
           </ul>
-          <h3>KGraphX Installation</h3>
+          <h3>OntoEditor Installation</h3>
           <ol>
             <li>Navigate to the root folder.</li>
             <li>
-              Run <code>npm install --force</code> to install the dependencies
+              Run <code>npm install </code> to install the dependencies
               and build the project.
             </li>
             <li>
-              Run <code>npm install grunt-cli -g</code> to install the npm
-              package <code>grunt-cli</code> globally.
+              Run <code>npm start</code> 
             </li>
             <li>
-              Run <code>grunt webserver</code> to start a local live-updating
-              web server.
+              Then, OntoEditor GUI is accessible at
+              <a href="http://localhost:5000/">http://localhost:5000/</a> 
             </li>
           </ol>
-          <h3>Fuseki Server Installation</h3>
+          <!-- <h3>Fuseki Server Installation</h3>
           <ol>
             <li>
               You can download the latest version normally under their
@@ -867,35 +878,33 @@ ______________________*/
               a default "dataset" will be used. Please remember to use it when
               exporting RDF/RDFS to the Fuseki server..
             </li>
-          </ol>
+          </ol> -->
           <h3>Running Using Docker</h3>
           <ol>
             <li>
-              You can also run KGraphX using docker, If you have it installed on
+              You can also run OntoEditor using docker, If you have it installed on
               your machine, otherwise, you use
               <a href="https://docs.docker.com/engine/install/">this</a>
               to install docker. Once you have docker, then you can issue the
-              following command to download the KGraphX docker image:
+              following command to download the OntoEditor docker image:
             </li>
-            <pre><code>docker pull ahemid/kgraphx</code></pre>
-            or you can create KGraphX docker image by giving the following
+            <pre><code>docker pull ahemid/ontoeditor</code></pre>
+            or you can create OntoEditor docker image by giving the following
             command on the project root folder:
-            <pre><code>docker build .  -t ahemid/kgraphx</code></pre>
+            <pre><code>docker build .  -t ahemid/ontoeditor</code></pre>
             <li>
-              Next, create the KGraphX docker container using the following
+              Next, create the ontoeditor docker container using the following
               command:
-              <pre><code>docker run -d -p 8000:8000 -p 3030:3030 ahemid/kgraphx </code></pre>
+              <pre><code>docker run -d -p 5000:5000 -p 8080:8080 ahemid/ontoeditor </code></pre>
             </li>
             <li>
-              Then, KGraphX GUI is accessible at
-              <a href="http://localhost:8000/">http://localhost:8000/</a> and
-              the Fuseki server is running at
-              <a href="http://localhost:3030/">http://localhost:3030/</a>
+              Then, OntoEditor GUI is accessible at
+              <a href="http://localhost:5000/">http://localhost:5000/</a> 
             </li>
           </ol>
         </div>
-      </div> -->
-      <div id="FAQ">
+      </div> 
+      <!-- <div id="FAQ"> -->
         <!-- <h2><u>Frequently Asked Questions for KGraphX Usage:</u></h2>
         <div>
           <div>
@@ -999,6 +1008,6 @@ ______________________*/
           </ul>
         </div>
       </div> -->
-    </div>
+    <!-- </div> -->
   </body>
 </html>
